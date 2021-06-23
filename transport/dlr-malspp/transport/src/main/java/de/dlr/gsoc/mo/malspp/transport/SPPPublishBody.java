@@ -62,7 +62,7 @@ public class SPPPublishBody extends SPPMessageBody implements MALPublishBody {
             [getElementCount()
                 - 1
                 - idx]; // Subtract 1 for UpdateHeaderList; subtract idx for Identifier in
-                        // SPPNotifyBody.
+    // SPPNotifyBody.
     for (int i = 0; i < lists.length; i++) {
       lists[i] = getUpdateList(i, updateLists == null ? null : updateLists[i]);
     }

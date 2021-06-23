@@ -44,7 +44,7 @@ public class Configuration {
   // Global constants
   protected static final String DURATION_EPOCH =
       "1958-01-01T00:00:00.000"; // in principle arbitrary, but user may specify CCSDS epoch for
-                                 // time code duration, which wpuld lead to problems
+  // time code duration, which wpuld lead to problems
   protected static final String DURATION_EPOCH_TIMESCALE = "TAI"; // same as above
   // PENDING: Epoch for FineTime in MAL Java API unclear. Here: Use 2013-01-01T00:00:00.000 TAI.
   protected static final String MAL_FINE_TIME_EPOCH = "2013-01-01T00:00:00.000";

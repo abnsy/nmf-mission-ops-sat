@@ -413,7 +413,7 @@ public class SPPEndpoint implements MALEndpoint {
             new Time(
                 System
                     .currentTimeMillis()), // PENDING: Epoch for Time in MAL Java API unclear. Here:
-                                           // Use Java
+            // Use Java
             // epoch.
             header.getQoSlevel(),
             header.getPriority(),
