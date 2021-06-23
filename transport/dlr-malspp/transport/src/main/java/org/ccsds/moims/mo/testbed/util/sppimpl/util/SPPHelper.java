@@ -1,35 +1,32 @@
-/** *****************************************************************************
- * Copyright or © or Copr. CNES
+/**
+ * ***************************************************************************** Copyright or © or
+ * Copr. CNES
  *
- * This software is a computer program whose purpose is to provide a
- * framework for the CCSDS Mission Operations services.
+ * <p>This software is a computer program whose purpose is to provide a framework for the CCSDS
+ * Mission Operations services.
  *
- * This software is governed by the CeCILL-C license under French law and
- * abiding by the rules of distribution of free software.  You can  use,
- * modify and/ or redistribute the software under the terms of the CeCILL-C
- * license as circulated by CEA, CNRS and INRIA at the following URL
+ * <p>This software is governed by the CeCILL-C license under French law and abiding by the rules of
+ * distribution of free software. You can use, modify and/ or redistribute the software under the
+ * terms of the CeCILL-C license as circulated by CEA, CNRS and INRIA at the following URL
  * "http://www.cecill.info".
  *
- * As a counterpart to the access to the source code and  rights to copy,
- * modify and redistribute granted by the license, users are provided only
- * with a limited warranty  and the software's author,  the holder of the
- * economic rights,  and the successive licensors  have only  limited
+ * <p>As a counterpart to the access to the source code and rights to copy, modify and redistribute
+ * granted by the license, users are provided only with a limited warranty and the software's
+ * author, the holder of the economic rights, and the successive licensors have only limited
  * liability.
  *
- * In this respect, the user's attention is drawn to the risks associated
- * with loading,  using,  modifying and/or developing or reproducing the
- * software by the user in light of its specific status of free software,
- * that may mean  that it is complicated to manipulate,  and  that  also
- * therefore means  that it is reserved for developers  and  experienced
- * professionals having in-depth computer knowledge. Users are therefore
- * encouraged to load and test the software's suitability as regards their
- * requirements in conditions enabling the security of their systems and/or
- * data to be ensured and,  more generally, to use and operate it in the
- * same conditions as regards security.
+ * <p>In this respect, the user's attention is drawn to the risks associated with loading, using,
+ * modifying and/or developing or reproducing the software by the user in light of its specific
+ * status of free software, that may mean that it is complicated to manipulate, and that also
+ * therefore means that it is reserved for developers and experienced professionals having in-depth
+ * computer knowledge. Users are therefore encouraged to load and test the software's suitability as
+ * regards their requirements in conditions enabling the security of their systems and/or data to be
+ * ensured and, more generally, to use and operate it in the same conditions as regards security.
  *
- * The fact that you are presently reading this means that you have had
- * knowledge of the CeCILL-C license and that you accept its terms.
- ****************************************************************************** */
+ * <p>The fact that you are presently reading this means that you have had knowledge of the CeCILL-C
+ * license and that you accept its terms.
+ * *****************************************************************************
+ */
 package org.ccsds.moims.mo.testbed.util.sppimpl.util;
 
 import java.io.BufferedReader;
@@ -39,12 +36,9 @@ import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-public class SPPHelper
-{
+public class SPPHelper {
 
-  /**
-   * Table used to compute the CRC
-   */
+  /** Table used to compute the CRC */
   private static final int[] lookUpTable;
 
   public static boolean isAPIDqualifierInMessage;
@@ -84,13 +78,12 @@ public class SPPHelper
     }
   }
 
-  public static boolean getCrcEnabled()
-  {
+  public static boolean getCrcEnabled() {
     return Boolean.parseBoolean(System.getProperty(CRC_ENABLED_PROPERTY, "true"));
   }
 
-  public static int computeCRC(final byte[] header, final byte[] data, final int offset, final int length)
-  {
+  public static int computeCRC(
+      final byte[] header, final byte[] data, final int offset, final int length) {
     int CRC = 0xFFFF;
     for (int i = 0; i < header.length; i++) {
       CRC = ((CRC << 8) & 0xFF00) ^ lookUpTable[(((CRC >> 8) ^ header[i]) & 0x00FF)];
@@ -101,8 +94,7 @@ public class SPPHelper
     return CRC;
   }
 
-  public static APIDRangeList initWhitelist(final File f)
-  {
+  public static APIDRangeList initWhitelist(final File f) {
     final APIDRangeList result = new APIDRangeList();
 
     final BufferedReader br;
@@ -128,5 +120,4 @@ public class SPPHelper
 
     return result;
   }
-
 }

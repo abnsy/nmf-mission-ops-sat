@@ -13,15 +13,17 @@
  * You on an "as is" basis and without warranties of any kind, including without
  * limitation merchantability, fitness for a particular purpose, absence of
  * defects or errors, accuracy or non-infringement of intellectual property rights.
- * 
+ *
  * See the License for the specific language governing permissions and
- * limitations under the License. 
+ * limitations under the License.
  * ----------------------------------------------------------------------------
  */
 package esa.mo.platform.impl.provider.opssat;
 
 import esa.mo.nanomind.impl.util.NanomindServicesConsumer;
 import esa.mo.platform.impl.provider.gen.PowerControlAdapterInterface;
+import esa.opssat.nanomind.opssat_pf.structures.PayloadDevice;
+import esa.opssat.nanomind.opssat_pf.structures.PayloadDeviceList;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -34,14 +36,11 @@ import org.ccsds.moims.mo.mal.MALException;
 import org.ccsds.moims.mo.mal.MALInteractionException;
 import org.ccsds.moims.mo.mal.structures.BooleanList;
 import org.ccsds.moims.mo.mal.structures.Identifier;
-import esa.opssat.nanomind.opssat_pf.structures.PayloadDevice;
-import esa.opssat.nanomind.opssat_pf.structures.PayloadDeviceList;
 import org.ccsds.moims.mo.platform.powercontrol.structures.Device;
 import org.ccsds.moims.mo.platform.powercontrol.structures.DeviceList;
 import org.ccsds.moims.mo.platform.powercontrol.structures.DeviceType;
 
-public class PowerControlOPSSATAdapter implements PowerControlAdapterInterface
-{
+public class PowerControlOPSSATAdapter implements PowerControlAdapterInterface {
 
   private final NanomindServicesConsumer obcServicesConsumer;
   private final List<Device> devices;
@@ -50,8 +49,7 @@ public class PowerControlOPSSATAdapter implements PowerControlAdapterInterface
   private final Map<Long, PayloadDevice> payloadIdByObjInstId;
   private static final Logger LOGGER = Logger.getLogger(PowerControlOPSSATAdapter.class.getName());
 
-  public PowerControlOPSSATAdapter(final NanomindServicesConsumer obcServicesConsumer)
-  {
+  public PowerControlOPSSATAdapter(final NanomindServicesConsumer obcServicesConsumer) {
     this.obcServicesConsumer = obcServicesConsumer;
     LOGGER.log(Level.INFO, "Initialisation");
     devices = new ArrayList<>();
@@ -61,28 +59,43 @@ public class PowerControlOPSSATAdapter implements PowerControlAdapterInterface
     initDevices();
   }
 
-  private void initDevices()
-  {
-    addDevice(new Device(true, 0L, new Identifier(
-        "Attitude Determination and Control System"), DeviceType.ADCS), PayloadDevice.FineADCS);
-    addDevice(new Device(true, 10L, new Identifier(
-        "Satellite Experimental Processing Platform 1"), DeviceType.OBC), PayloadDevice.SEPP1);
-    addDevice(new Device(true, 11L, new Identifier(
-        "Satellite Experimental Processing Platform 2"), DeviceType.OBC), PayloadDevice.SEPP2);
-    addDevice(new Device(false, 2L, new Identifier("S-Band Transceiver"), DeviceType.SBAND),
+  private void initDevices() {
+    addDevice(
+        new Device(
+            true, 0L, new Identifier("Attitude Determination and Control System"), DeviceType.ADCS),
+        PayloadDevice.FineADCS);
+    addDevice(
+        new Device(
+            true,
+            10L,
+            new Identifier("Satellite Experimental Processing Platform 1"),
+            DeviceType.OBC),
+        PayloadDevice.SEPP1);
+    addDevice(
+        new Device(
+            true,
+            11L,
+            new Identifier("Satellite Experimental Processing Platform 2"),
+            DeviceType.OBC),
+        PayloadDevice.SEPP2);
+    addDevice(
+        new Device(false, 2L, new Identifier("S-Band Transceiver"), DeviceType.SBAND),
         PayloadDevice.SBandTRX);
-    addDevice(new Device(false, 3L, new Identifier("X-Band Transmitter"), DeviceType.XBAND),
+    addDevice(
+        new Device(false, 3L, new Identifier("X-Band Transmitter"), DeviceType.XBAND),
         PayloadDevice.XBandTRX);
-    addDevice(new Device(false, 4L, new Identifier("Software Defined Radio"),
-        DeviceType.SDR), PayloadDevice.SDR);
-    addDevice(new Device(false, 5L, new Identifier("Optical Receiver"), DeviceType.OPTRX),
+    addDevice(
+        new Device(false, 4L, new Identifier("Software Defined Radio"), DeviceType.SDR),
+        PayloadDevice.SDR);
+    addDevice(
+        new Device(false, 5L, new Identifier("Optical Receiver"), DeviceType.OPTRX),
         PayloadDevice.OpticalRX);
-    addDevice(new Device(false, 6L, new Identifier("HD Camera"), DeviceType.CAMERA),
+    addDevice(
+        new Device(false, 6L, new Identifier("HD Camera"), DeviceType.CAMERA),
         PayloadDevice.HDCamera);
   }
 
-  private void addDevice(final Device device, final PayloadDevice payloadId)
-  {
+  private void addDevice(final Device device, final PayloadDevice payloadId) {
     devices.add(device);
     deviceByName.put(device.getName(), device);
     deviceByObjInstId.put(device.getUnitObjInstId(), device);
@@ -90,13 +103,11 @@ public class PowerControlOPSSATAdapter implements PowerControlAdapterInterface
   }
 
   @Override
-  public Map<Identifier, Device> getDeviceMap()
-  {
+  public Map<Identifier, Device> getDeviceMap() {
     return Collections.unmodifiableMap(deviceByName);
   }
 
-  private Device findByType(final DeviceType type)
-  {
+  private Device findByType(final DeviceType type) {
     for (final Device device : devices) {
       if (device.getDeviceType() == type) {
         return device;
@@ -106,10 +117,9 @@ public class PowerControlOPSSATAdapter implements PowerControlAdapterInterface
   }
 
   @Override
-  public void enableDevices(final DeviceList inputList) throws IOException
-  {
+  public void enableDevices(final DeviceList inputList) throws IOException {
     for (final Device device : inputList) {
-      LOGGER.log(Level.INFO, "Looking up Device {0}", new Object[]{device});
+      LOGGER.log(Level.INFO, "Looking up Device {0}", new Object[] {device});
       PayloadDevice payloadId = payloadIdByObjInstId.get(device.getUnitObjInstId());
       if (device.getUnitObjInstId() != null) {
         payloadId = payloadIdByObjInstId.get(device.getUnitObjInstId());
@@ -129,20 +139,20 @@ public class PowerControlOPSSATAdapter implements PowerControlAdapterInterface
     }
   }
 
-  private void switchDevice(final PayloadDevice device, final Boolean enabled) throws IOException
-  {
+  private void switchDevice(final PayloadDevice device, final Boolean enabled) throws IOException {
     // TODO: Track status of the device in the device list
     final PayloadDeviceList deviceList = new PayloadDeviceList();
     final BooleanList powerStates = new BooleanList();
     deviceList.add(device);
     powerStates.add(enabled);
-    LOGGER.log(Level.INFO, "Switching device {0} to enabled: {1}", new Object[]{device, enabled});
+    LOGGER.log(Level.INFO, "Switching device {0} to enabled: {1}", new Object[] {device, enabled});
     try {
-      obcServicesConsumer.getPowerNanomindService().getPowerNanomindStub().setPowerState(deviceList,
-          powerStates);
+      obcServicesConsumer
+          .getPowerNanomindService()
+          .getPowerNanomindStub()
+          .setPowerState(deviceList, powerStates);
     } catch (final MALInteractionException | MALException ex) {
       throw new IOException("Cannot switch device through OBC", ex);
     }
   }
-
 }

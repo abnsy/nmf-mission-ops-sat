@@ -13,45 +13,40 @@
  * You on an "as is" basis and without warranties of any kind, including without
  * limitation merchantability, fitness for a particular purpose, absence of
  * defects or errors, accuracy or non-infringement of intellectual property rights.
- * 
+ *
  * See the License for the specific language governing permissions and
- * limitations under the License. 
+ * limitations under the License.
  * ----------------------------------------------------------------------------
  */
 package esa.mo.platform.impl.provider.opssat;
 
+import at.tugraz.ihf.opssat.opt_rx.SEPP_OPT_RX_API;
 import esa.mo.platform.impl.provider.gen.OpticalDataReceiverAdapterInterface;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.ccsds.moims.mo.mal.structures.Duration;
-import at.tugraz.ihf.opssat.opt_rx.SEPP_OPT_RX_API;
 
-public class OpticalRxOPSSATAdapter implements OpticalDataReceiverAdapterInterface
-{
+public class OpticalRxOPSSATAdapter implements OpticalDataReceiverAdapterInterface {
 
   private static final Logger LOGGER = Logger.getLogger(OpticalRxOPSSATAdapter.class.getName());
   private SEPP_OPT_RX_API optRxApi;
   private final boolean initalized;
 
-  public OpticalRxOPSSATAdapter()
-  {
+  public OpticalRxOPSSATAdapter() {
     LOGGER.log(Level.INFO, "Initialisation");
     try {
       System.loadLibrary("opt_rx_api_jni");
       optRxApi = new SEPP_OPT_RX_API();
     } catch (final Exception ex) {
-      LOGGER.log(Level.SEVERE,
-          "OPT RX API could not be initialized!", ex);
+      LOGGER.log(Level.SEVERE, "OPT RX API could not be initialized!", ex);
       initalized = false;
       return;
     }
     initalized = true;
-
   }
 
   @Override
-  public byte[] recordOpticalReceiverData(final Duration duration)
-  {
+  public byte[] recordOpticalReceiverData(final Duration duration) {
     if (duration == null) {
       return null;
     }
@@ -71,9 +66,7 @@ public class OpticalRxOPSSATAdapter implements OpticalDataReceiverAdapterInterfa
   }
 
   @Override
-  public boolean isUnitAvailable()
-  {
+  public boolean isUnitAvailable() {
     return initalized;
   }
-
 }

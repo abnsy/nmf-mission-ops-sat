@@ -13,13 +13,26 @@
  * You on an "as is" basis and without warranties of any kind, including without
  * limitation merchantability, fitness for a particular purpose, absence of
  * defects or errors, accuracy or non-infringement of intellectual property rights.
- * 
+ *
  * See the License for the specific language governing permissions and
- * limitations under the License. 
+ * limitations under the License.
  * ----------------------------------------------------------------------------
  */
 package esa.mo.nanomind.impl.parameters_provisioning;
 
+import esa.mo.helpertools.connections.SingleConnectionDetails;
+import esa.mo.nanomind.impl.parameters_provisioning.LimitedNanomindAggregationConsumer.QueryRateExceededException;
+import esa.mo.nmf.nanosatmosupervisor.parameter.OBSWAggregation;
+import esa.mo.nmf.nanosatmosupervisor.parameter.OBSWParameter;
+import esa.opssat.nanomind.mc.aggregation.body.GetValueResponse;
+import esa.opssat.nanomind.mc.aggregation.structures.AggregationCategory;
+import esa.opssat.nanomind.mc.aggregation.structures.AggregationDefinition;
+import esa.opssat.nanomind.mc.aggregation.structures.AggregationDefinitionList;
+import esa.opssat.nanomind.mc.aggregation.structures.AggregationReference;
+import esa.opssat.nanomind.mc.aggregation.structures.AggregationReferenceList;
+import esa.opssat.nanomind.mc.aggregation.structures.AggregationValue;
+import esa.opssat.nanomind.mc.aggregation.structures.AggregationValueList;
+import esa.opssat.nanomind.mc.aggregation.structures.factory.AggregationCategoryFactory;
 import java.math.BigInteger;
 import java.net.MalformedURLException;
 import java.util.ArrayList;
@@ -34,34 +47,18 @@ import org.ccsds.moims.mo.mal.structures.Identifier;
 import org.ccsds.moims.mo.mal.structures.IdentifierList;
 import org.ccsds.moims.mo.mal.structures.LongList;
 import org.ccsds.moims.mo.mal.structures.URI;
-import esa.mo.helpertools.connections.SingleConnectionDetails;
-import esa.mo.nanomind.impl.parameters_provisioning.LimitedNanomindAggregationConsumer.QueryRateExceededException;
-import esa.mo.nmf.nanosatmosupervisor.parameter.OBSWAggregation;
-import esa.mo.nmf.nanosatmosupervisor.parameter.OBSWParameter;
-import esa.opssat.nanomind.mc.aggregation.body.GetValueResponse;
-import esa.opssat.nanomind.mc.aggregation.structures.AggregationCategory;
-import esa.opssat.nanomind.mc.aggregation.structures.AggregationDefinition;
-import esa.opssat.nanomind.mc.aggregation.structures.AggregationDefinitionList;
-import esa.opssat.nanomind.mc.aggregation.structures.AggregationReference;
-import esa.opssat.nanomind.mc.aggregation.structures.AggregationReferenceList;
-import esa.opssat.nanomind.mc.aggregation.structures.AggregationValue;
-import esa.opssat.nanomind.mc.aggregation.structures.AggregationValueList;
-import esa.opssat.nanomind.mc.aggregation.structures.factory.AggregationCategoryFactory;
 
 /**
  * Provides OBSW parameter values by consuming the Nanomind aggregation service. Aggregation service
  * is used with restrictions to avoid overloading the Nanomind.
- * 
- * @author Tanguy Soto
  *
+ * @author Tanguy Soto
  */
 class NanomindAggregationsHandler {
   private static final Logger LOGGER =
       Logger.getLogger(NanomindAggregationsHandler.class.getName());
 
-  /**
-   * Maximum number of parameters in one aggregation
-   */
+  /** Maximum number of parameters in one aggregation */
   private int PARAMS_PER_AGGREGATION = 8;
 
   /*
@@ -69,18 +66,14 @@ class NanomindAggregationsHandler {
    */
   private int MAX_DEFINABLE_AGGREGATION = 100;
 
-  /**
-   * Nanomind aggregation service consumer
-   */
+  /** Nanomind aggregation service consumer */
   private LimitedNanomindAggregationConsumer aggServiceCns;
 
   private static final String NANOMIND_APID = "10"; // Default Nanomind APID (on 13 June 2016)
   private static final String MAL_SPP_BINDINDING = "malspp"; // Use the SPP Implementation
   private static final String SOURCE_ID = "0"; // OBSW supports any value. By default it is set to 0
 
-  /**
-   * Prefix for name of all aggregation definitions we generate.
-   */
+  /** Prefix for name of all aggregation definitions we generate. */
   private static final String AGG_DEF_NAME_PREFIX = "Z";
 
   /**
@@ -89,14 +82,10 @@ class NanomindAggregationsHandler {
    */
   private List<String> aggsToReUse = new ArrayList<>();
 
-  /**
-   * List of the aggregations currently defined by this class in the Nanomind.
-   */
+  /** List of the aggregations currently defined by this class in the Nanomind. */
   private List<OBSWAggregation> nanomindDefinitions = new ArrayList<>();
 
-  /**
-   * False until we leaned potential leftovers aggregations definitions from the Nanomind.
-   */
+  /** False until we leaned potential leftovers aggregations definitions from the Nanomind. */
   private boolean isInitialized = false;
 
   public NanomindAggregationsHandler() throws MALException, MalformedURLException {
@@ -104,9 +93,7 @@ class NanomindAggregationsHandler {
     initAggregationServiceConsumer();
   }
 
-  /**
-   * Load the system properties that we need.
-   */
+  /** Load the system properties that we need. */
   private void loadProperties() {
     // Parameters per aggregation
     String paramsPerAggregationProp =
@@ -117,13 +104,12 @@ class NanomindAggregationsHandler {
     // Max definable aggregations
     String maxDefinableAggregationsProp =
         "nmf.supervisor.parameter.valuesprovider.nanomind.maxDefinableAggregations";
-    MAX_DEFINABLE_AGGREGATION = ConfigurationHelper.getIntegerProperty(maxDefinableAggregationsProp,
-        MAX_DEFINABLE_AGGREGATION);
+    MAX_DEFINABLE_AGGREGATION =
+        ConfigurationHelper.getIntegerProperty(
+            maxDefinableAggregationsProp, MAX_DEFINABLE_AGGREGATION);
   }
 
-  /**
-   * Initializes the Nanomind aggregation service consumer
-   */
+  /** Initializes the Nanomind aggregation service consumer */
   private void initAggregationServiceConsumer() throws MALException, MalformedURLException {
     // Connection details to Nanomind aggregation service
     SingleConnectionDetails details = new SingleConnectionDetails();
@@ -148,15 +134,17 @@ class NanomindAggregationsHandler {
     aggIds.add(aggId);
     try {
       GetValueResponse valueResponse = aggServiceCns.getAggregationNanomindStub().getValue(aggIds);
-      LOGGER.log(Level.FINE,
-          String.format("Agg. value for agg. id %d fetched from Nanomind", aggId));
+      LOGGER.log(
+          Level.FINE, String.format("Agg. value for agg. id %d fetched from Nanomind", aggId));
 
       AggregationValueList aggValueList = valueResponse.getBodyElement1();
       AggregationValue aggValue = aggValueList.get(0);
       return aggValue;
     } catch (MALInteractionException | MALException e) {
-      LOGGER.log(Level.SEVERE,
-          "Error while calling getValue operation of Nanomind aggregation service", e);
+      LOGGER.log(
+          Level.SEVERE,
+          "Error while calling getValue operation of Nanomind aggregation service",
+          e);
     } catch (QueryRateExceededException e) {
       LOGGER.log(Level.SEVERE, e.getMessage());
     }
@@ -228,7 +216,8 @@ class NanomindAggregationsHandler {
   private OBSWAggregation createAggregation() {
     String aggIdentifier = nextAggregationIdentifier();
     if (aggIdentifier == null) {
-      LOGGER.log(Level.WARNING,
+      LOGGER.log(
+          Level.WARNING,
           "Max number of aggregation definitions reached, can't fetch value of new parameter");
       return null;
     }
@@ -260,13 +249,16 @@ class NanomindAggregationsHandler {
 
     try {
       aggServiceCns.getAggregationNanomindStub().updateDefinition(ids, aggList);
-      LOGGER.log(Level.FINE,
+      LOGGER.log(
+          Level.FINE,
           String.format("Agg. definition %s updated in Nanomind", updatedAggregation.getName()));
       return true;
     } catch (MALInteractionException | MALException e) {
       // Aggregation couldn't be updated to the Nanomind
-      LOGGER.log(Level.SEVERE,
-          "Error while calling updateDefinition operation of Nanomind aggregation service", e);
+      LOGGER.log(
+          Level.SEVERE,
+          "Error while calling updateDefinition operation of Nanomind aggregation service",
+          e);
     } catch (QueryRateExceededException e) {
       LOGGER.log(Level.SEVERE, e.getMessage());
     }
@@ -286,13 +278,16 @@ class NanomindAggregationsHandler {
     try {
       aggServiceCns.getAggregationNanomindStub().addDefinition(list);
       nanomindDefinitions.add(newAggregation);
-      LOGGER.log(Level.FINE,
+      LOGGER.log(
+          Level.FINE,
           String.format("Agg. definition %s added in Nanomind", newAggregation.getName()));
       return true;
     } catch (MALInteractionException | MALException e) {
       // Aggregation couldn't be added to the Nanomind
-      LOGGER.log(Level.SEVERE,
-          "Error while calling addDefinition operation of Nanomind aggregation service", e);
+      LOGGER.log(
+          Level.SEVERE,
+          "Error while calling addDefinition operation of Nanomind aggregation service",
+          e);
     } catch (QueryRateExceededException e) {
       LOGGER.log(Level.FINE, e.getMessage());
     }
@@ -320,10 +315,16 @@ class NanomindAggregationsHandler {
     paramsSetList.add(paramsSet);
 
     // Aggregation definition
-    AggregationDefinition def = new AggregationDefinition(new Identifier(obswAggregation.getName()),
-        obswAggregation.getDescription(), AggregationCategory.GENERAL,
-        obswAggregation.isGenerationEnabled(), new Duration(obswAggregation.getUpdateInterval()),
-        false, new Duration(), paramsSetList);
+    AggregationDefinition def =
+        new AggregationDefinition(
+            new Identifier(obswAggregation.getName()),
+            obswAggregation.getDescription(),
+            AggregationCategory.GENERAL,
+            obswAggregation.isGenerationEnabled(),
+            new Duration(obswAggregation.getUpdateInterval()),
+            false,
+            new Duration(),
+            paramsSetList);
 
     // Finally the list
     AggregationDefinitionList list = new AggregationDefinitionList();
@@ -336,7 +337,7 @@ class NanomindAggregationsHandler {
    * Fetches a new value for the given parameter by querying the Nanomind aggregation service. We
    * define an aggregation including the parameter if not included in one yet and get the value of
    * this aggregation.
-   * 
+   *
    * @param obswParam The parameter
    * @return The value of the containing aggregation or null if a problem occurred while fetching
    */
@@ -358,7 +359,7 @@ class NanomindAggregationsHandler {
 
   /**
    * @return The next aggregation identifier to use at the moment of the call or null if we reached
-   *         the limit of aggregations definitions
+   *     the limit of aggregations definitions
    */
   private String nextAggregationIdentifier() {
     // re-use a cleaned aggregation first
@@ -374,7 +375,7 @@ class NanomindAggregationsHandler {
 
   /**
    * Generates a 4 letters aggregation identifier using from our local aggregation number.
-   * 
+   *
    * @param i the local aggregation number between 0 and MAX_DEFINABLE_AGGREGATION - 1
    * @return the aggregation identifier
    */
@@ -386,22 +387,22 @@ class NanomindAggregationsHandler {
    * Converts an 4 letters aggregation identifier to its corresponding aggregation ID in the
    * Nanomind. We know that on OPS-SAT Nanomind, an aggregation ID is equals to the long value
    * represented by the aggregation identifier's characters.
-   * 
+   *
    * @param identifier the identifier to convert
    * @return the corresponding aggregation id
    */
   private long aggregationIdentifier2AggregationId(String identifier) {
     if (identifier == null || identifier.length() != 4) {
-      LOGGER.log(Level.SEVERE, String.format(
-          "Trying to convert a wrong aggregation identifier: %s, 0 is returned", identifier));
+      LOGGER.log(
+          Level.SEVERE,
+          String.format(
+              "Trying to convert a wrong aggregation identifier: %s, 0 is returned", identifier));
       return 0;
     }
     return new BigInteger(identifier.getBytes()).longValue();
   }
 
-  /**
-   * Cleans all the aggregations that could have been defined by us in the Nanomind.
-   */
+  /** Cleans all the aggregations that could have been defined by us in the Nanomind. */
   public void cleanAllAggregations() {
     LOGGER.log(Level.INFO, "Cleaning aggregations definitions in Nanomind");
     try {
@@ -439,7 +440,7 @@ class NanomindAggregationsHandler {
   /**
    * List aggregations definitions present in the Nanomind corresponding to the specified range of
    * our local aggregations number.
-   * 
+   *
    * @param start The start of the range (included)
    * @param end The end of the range (excluded)
    * @return The list or null if an error happened
@@ -454,18 +455,19 @@ class NanomindAggregationsHandler {
       LongList idsList = aggServiceCns.getAggregationNanomindStub().listDefinition(identifierList);
       return idsList;
     } catch (QueryRateExceededException | MALInteractionException | MALException e) {
-      LOGGER.log(Level.SEVERE,
-          "Error while calling listDefinition operation of Nanomind aggregation service", e);
+      LOGGER.log(
+          Level.SEVERE,
+          "Error while calling listDefinition operation of Nanomind aggregation service",
+          e);
     }
 
     return null;
   }
 
-
   /**
    * Removes parameters that have not been requested for a while from the aggregations definitions
    * in the Nanomind.
-   * 
+   *
    * @param cache The cache handler to determine if the parameter is still used
    * @param timeout The time (seconds) after which we consider a parameter is not used anymore
    */
@@ -545,9 +547,7 @@ class NanomindAggregationsHandler {
     nanomindDefinitions.addAll(newNanomindDefinitions);
   }
 
-  /**
-   * Logs aggregation definitions present locally and in the nanomind.
-   */
+  /** Logs aggregation definitions present locally and in the nanomind. */
   private void logDefinedAggregations() {
     String message = "Locally defined aggregations:\n";
     for (OBSWAggregation obswAgg : nanomindDefinitions) {
@@ -570,9 +570,7 @@ class NanomindAggregationsHandler {
     LOGGER.log(Level.INFO, message);
   }
 
-  /**
-   * @return the isInitialized
-   */
+  /** @return the isInitialized */
   public boolean isInitialized() {
     return isInitialized;
   }

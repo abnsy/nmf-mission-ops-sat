@@ -13,20 +13,20 @@
  * You on an "as is" basis and without warranties of any kind, including without
  * limitation merchantability, fitness for a particular purpose, absence of
  * defects or errors, accuracy or non-infringement of intellectual property rights.
- * 
+ *
  * See the License for the specific language governing permissions and
- * limitations under the License. 
+ * limitations under the License.
  * ----------------------------------------------------------------------------
  */
 package esa.mo.nanomind.impl.parameters_provisioning;
 
+import esa.mo.nmf.nanosatmosupervisor.parameter.OBSWParameter;
+import esa.mo.nmf.nanosatmosupervisor.parameter.OBSWParameterValuesProvider;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import org.ccsds.moims.mo.mal.structures.Attribute;
 import org.ccsds.moims.mo.mal.structures.Identifier;
-import esa.mo.nmf.nanosatmosupervisor.parameter.OBSWParameter;
-import esa.mo.nmf.nanosatmosupervisor.parameter.OBSWParameterValuesProvider;
 
 /**
  * Provides OBSW parameter values through a caching mechanism. For a given parameter, it only
@@ -36,23 +36,19 @@ import esa.mo.nmf.nanosatmosupervisor.parameter.OBSWParameterValuesProvider;
  */
 class CacheHandler extends OBSWParameterValuesProvider {
 
-  /**
-   * Map of OBSW parameter value by parameter name acting as our cache storage.
-   */
+  /** Map of OBSW parameter value by parameter name acting as our cache storage. */
   private final Map<Identifier, TimedAttributeValue> cache;
 
   /*
    * Cache configuration settings
    */
 
-  /**
-   * Maximum time a parameter value should stay in the cache in milliseconds.
-   */
+  /** Maximum time a parameter value should stay in the cache in milliseconds. */
   private int cachingTime = 10000;
 
   /**
    * Creates a new instance of CacheHandler.
-   * 
+   *
    * @param parameterMap
    */
   public CacheHandler(HashMap<Identifier, OBSWParameter> parameterMap) {
@@ -62,7 +58,7 @@ class CacheHandler extends OBSWParameterValuesProvider {
 
   /**
    * Sets the maximum time a parameter value should stay in the cache in milliseconds.
-   * 
+   *
    * @param cachingTime the time
    */
   public void setCachingTime(int cachingTime) {
@@ -95,7 +91,7 @@ class CacheHandler extends OBSWParameterValuesProvider {
 
   /**
    * Updates the last request time of this parameter to the time of the call.
-   * 
+   *
    * @param identifier Name of the parameter
    */
   public synchronized void updateLastRequestTime(Identifier identifier) {
