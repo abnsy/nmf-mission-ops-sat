@@ -1,34 +1,31 @@
 /**
- * *****************************************************************************
- * Copyright or © or Copr. CNES
+ * ***************************************************************************** Copyright or © or
+ * Copr. CNES
  *
- * This software is a computer program whose purpose is to provide a framework
- * for the CCSDS Mission Operations services.
+ * <p>This software is a computer program whose purpose is to provide a framework for the CCSDS
+ * Mission Operations services.
  *
- * This software is governed by the CeCILL-C license under French law and
- * abiding by the rules of distribution of free software. You can use, modify
- * and/ or redistribute the software under the terms of the CeCILL-C license as
- * circulated by CEA, CNRS and INRIA at the following URL
+ * <p>This software is governed by the CeCILL-C license under French law and abiding by the rules of
+ * distribution of free software. You can use, modify and/ or redistribute the software under the
+ * terms of the CeCILL-C license as circulated by CEA, CNRS and INRIA at the following URL
  * "http://www.cecill.info".
  *
- * As a counterpart to the access to the source code and rights to copy, modify
- * and redistribute granted by the license, users are provided only with a
- * limited warranty and the software's author, the holder of the economic
- * rights, and the successive licensors have only limited liability.
+ * <p>As a counterpart to the access to the source code and rights to copy, modify and redistribute
+ * granted by the license, users are provided only with a limited warranty and the software's
+ * author, the holder of the economic rights, and the successive licensors have only limited
+ * liability.
  *
- * In this respect, the user's attention is drawn to the risks associated with
- * loading, using, modifying and/or developing or reproducing the software by
- * the user in light of its specific status of free software, that may mean that
- * it is complicated to manipulate, and that also therefore means that it is
- * reserved for developers and experienced professionals having in-depth
- * computer knowledge. Users are therefore encouraged to load and test the
- * software's suitability as regards their requirements in conditions enabling
- * the security of their systems and/or data to be ensured and, more generally,
- * to use and operate it in the same conditions as regards security.
+ * <p>In this respect, the user's attention is drawn to the risks associated with loading, using,
+ * modifying and/or developing or reproducing the software by the user in light of its specific
+ * status of free software, that may mean that it is complicated to manipulate, and that also
+ * therefore means that it is reserved for developers and experienced professionals having in-depth
+ * computer knowledge. Users are therefore encouraged to load and test the software's suitability as
+ * regards their requirements in conditions enabling the security of their systems and/or data to be
+ * ensured and, more generally, to use and operate it in the same conditions as regards security.
  *
- * The fact that you are presently reading this means that you have had
- * knowledge of the CeCILL-C license and that you accept its terms.
- ******************************************************************************
+ * <p>The fact that you are presently reading this means that you have had knowledge of the CeCILL-C
+ * license and that you accept its terms.
+ * *****************************************************************************
  */
 package org.ccsds.moims.mo.testbed.util.sppimpl.util;
 
@@ -40,10 +37,9 @@ import java.util.logging.Logger;
 import org.ccsds.moims.mo.testbed.util.spp.SpacePacket;
 import org.ccsds.moims.mo.testbed.util.spp.SpacePacketHeader;
 
-public class SPPReader
-{
+public class SPPReader {
   private static final Logger LOGGER = Logger.getLogger(SPPReader.class.getName());
-  final protected static char[] HEX_ARRAY = "0123456789ABCDEF".toCharArray();
+  protected static final char[] HEX_ARRAY = "0123456789ABCDEF".toCharArray();
   private final String PROCESSED_FILENAME = "processed_apids.txt";
 
   private final byte[] apidQualifierBuffer;
@@ -58,8 +54,7 @@ public class SPPReader
   private SpacePacket packet;
   private int errorCount;
 
-  public SPPReader(final InputStream is)
-  {
+  public SPPReader(final InputStream is) {
     errorCount = 0;
     this.is = is;
     apidQualifierBuffer = new byte[2];
@@ -70,9 +65,8 @@ public class SPPReader
     processedApids = SPPHelper.initWhitelist(new File(PROCESSED_FILENAME));
   }
 
-  private int read(final byte[] b, final int initialOffset, final int totalLength) throws
-      IOException
-  {
+  private int read(final byte[] b, final int initialOffset, final int totalLength)
+      throws IOException {
     int n;
     int len = 0;
     do {
@@ -86,14 +80,14 @@ public class SPPReader
     return len;
   }
 
-  public synchronized SpacePacket receive() throws IOException
-  {
+  public synchronized SpacePacket receive() throws IOException {
     final int apidQualifier;
 
     if (SPPHelper.isAPIDqualifierInMessage) {
       // 1- Read the APID qualifier
       read(apidQualifierBuffer, 0, 2);
-      // Logger.getLogger(this.getClass().getName()).log(Level.INFO, "APID Qualifier: {0}",bytesToHex(apidQualifierBuffer));
+      // Logger.getLogger(this.getClass().getName()).log(Level.INFO, "APID Qualifier:
+      // {0}",bytesToHex(apidQualifierBuffer));
       apidQualifier = (((apidQualifierBuffer[0] & 0xFF) << 8) | (apidQualifierBuffer[1] & 0xFF));
     } else {
       apidQualifier = SPPHelper.defaultAPIDqualifier;
@@ -106,7 +100,8 @@ public class SPPReader
 
     // 2- Read the Space Packet
     read(inHeaderBuffer, 0, 6);
-//        Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Header: {0}",bytesToHex(inHeaderBuffer));
+    //        Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Header:
+    // {0}",bytesToHex(inHeaderBuffer));
     int pk_ident = inHeaderBuffer[0] & 0xFF;
     pk_ident = (pk_ident << 8) | (inHeaderBuffer[1] & 0xFF);
     final int vers_nb = (pk_ident >> 13) & 0x0007;
@@ -160,15 +155,24 @@ public class SPPReader
       final int CRC = SPPHelper.computeCRC(inHeaderBuffer, data, outPacket.getOffset(), dataLength);
       if (CRC != readCRC) {
         final String error =
-          "CRC Error:"
-          + " expected=" + CRC
-          + ", read=" + readCRC
-          + " for "
-          + " APID(" + apid + ")"
-          + ", SSC=" + seq_count + ""
-          + ", pkt_len=" + pkt_length_value
-          + ", header=" + bytesToHex(inHeaderBuffer)
-          + ", body=" + bytesToHex(data);
+            "CRC Error:"
+                + " expected="
+                + CRC
+                + ", read="
+                + readCRC
+                + " for "
+                + " APID("
+                + apid
+                + ")"
+                + ", SSC="
+                + seq_count
+                + ""
+                + ", pkt_len="
+                + pkt_length_value
+                + ", header="
+                + bytesToHex(inHeaderBuffer)
+                + ", body="
+                + bytesToHex(data);
         LOGGER.log(Level.WARNING, error);
         errorCount++;
         if (errorCount >= 3) {
@@ -182,18 +186,17 @@ public class SPPReader
     return outPacket;
   }
 
-  public SpacePacket getPacket()
-  {
+  public SpacePacket getPacket() {
     return packet;
   }
 
   public static String bytesToHex(final byte[] bytes) {
-      final char[] hexChars = new char[bytes.length * 2];
-      for (int j = 0; j < bytes.length; j++) {
-          final int v = bytes[j] & 0xFF;
-          hexChars[j * 2] = HEX_ARRAY[v >>> 4];
-          hexChars[j * 2 + 1] = HEX_ARRAY[v & 0x0F];
-      }
-      return new String(hexChars);
+    final char[] hexChars = new char[bytes.length * 2];
+    for (int j = 0; j < bytes.length; j++) {
+      final int v = bytes[j] & 0xFF;
+      hexChars[j * 2] = HEX_ARRAY[v >>> 4];
+      hexChars[j * 2 + 1] = HEX_ARRAY[v & 0x0F];
+    }
+    return new String(hexChars);
   }
 }

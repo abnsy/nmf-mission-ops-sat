@@ -13,13 +13,17 @@
  * You on an "as is" basis and without warranties of any kind, including without
  * limitation merchantability, fitness for a particular purpose, absence of
  * defects or errors, accuracy or non-infringement of intellectual property rights.
- * 
+ *
  * See the License for the specific language governing permissions and
- * limitations under the License. 
+ * limitations under the License.
  * ----------------------------------------------------------------------------
  */
 package esa.mo.nanomind.impl.parameters_provisioning;
 
+import esa.mo.nmf.nanosatmosupervisor.parameter.OBSWAggregation;
+import esa.mo.nmf.nanosatmosupervisor.parameter.OBSWParameter;
+import esa.mo.nmf.nanosatmosupervisor.parameter.OBSWParameterValuesProvider;
+import esa.opssat.nanomind.mc.aggregation.structures.AggregationValue;
 import java.net.MalformedURLException;
 import java.util.HashMap;
 import java.util.Timer;
@@ -30,10 +34,6 @@ import java.util.logging.Logger;
 import org.ccsds.moims.mo.mal.MALException;
 import org.ccsds.moims.mo.mal.structures.Attribute;
 import org.ccsds.moims.mo.mal.structures.Identifier;
-import esa.mo.nmf.nanosatmosupervisor.parameter.OBSWAggregation;
-import esa.mo.nmf.nanosatmosupervisor.parameter.OBSWParameter;
-import esa.mo.nmf.nanosatmosupervisor.parameter.OBSWParameterValuesProvider;
-import esa.opssat.nanomind.mc.aggregation.structures.AggregationValue;
 
 /**
  * Provides OBSW parameter values by consuming the Nanomind aggregation service. Fetched values are
@@ -43,9 +43,7 @@ import esa.opssat.nanomind.mc.aggregation.structures.AggregationValue;
  * @author Tanguy Soto
  */
 public class NanomindParameterValuesProvider extends OBSWParameterValuesProvider {
-  /**
-   * The logger
-   */
+  /** The logger */
   private static final Logger LOGGER =
       Logger.getLogger(NanomindParameterValuesProvider.class.getName());
 
@@ -55,29 +53,21 @@ public class NanomindParameterValuesProvider extends OBSWParameterValuesProvider
    */
   private int CACHING_TIME = 10000;
 
-  /**
-   * Interval (seconds) between attempts to clean aggregations definitions.
-   */
+  /** Interval (seconds) between attempts to clean aggregations definitions. */
   private int AGGREGATION_CLEANING_INTERVAL = 300;
 
-  /**
-   * Object handling caching of the values
-   */
+  /** Object handling caching of the values */
   private CacheHandler cacheHandler;
 
-  /**
-   * Nanomind aggregations handler.
-   */
+  /** Nanomind aggregations handler. */
   private NanomindAggregationsHandler aggHandler;
 
-  /**
-   * Main lock to synchronize cache and aggregations manipulations.
-   */
+  /** Main lock to synchronize cache and aggregations manipulations. */
   private final ReentrantLock lock = new ReentrantLock();
 
   /**
    * Creates a new instance of CacheParameterValuesProvider.
-   * 
+   *
    * @param parameterMap The map of OBSW parameters for which we have to provide values for
    */
   public NanomindParameterValuesProvider(HashMap<Identifier, OBSWParameter> parameterMap) {
@@ -92,9 +82,7 @@ public class NanomindParameterValuesProvider extends OBSWParameterValuesProvider
     }
   }
 
-  /**
-   * Load the system properties that we need.
-   */
+  /** Load the system properties that we need. */
   private void loadProperties() {
     // Caching time
     String cachingTimeProp = "nmf.supervisor.parameter.valuesprovider.nanomind.cachingTime";
@@ -117,9 +105,7 @@ public class NanomindParameterValuesProvider extends OBSWParameterValuesProvider
     this.cacheHandler.setCachingTime(CACHING_TIME);
   }
 
-  /**
-   * Initializes the Nanomind aggregation handler.
-   */
+  /** Initializes the Nanomind aggregation handler. */
   private void initAggregationHandler() throws MalformedURLException, MALException {
     aggHandler = new NanomindAggregationsHandler();
   }
@@ -131,26 +117,29 @@ public class NanomindParameterValuesProvider extends OBSWParameterValuesProvider
   private void scheduleCleaners() {
     // Full clean on startup
     Timer timer = new Timer(true);
-    timer.schedule(new TimerTask() {
-      @Override
-      public void run() {
-        cleanAllAggregations();
-      }
-    }, 10000);
+    timer.schedule(
+        new TimerTask() {
+          @Override
+          public void run() {
+            cleanAllAggregations();
+          }
+        },
+        10000);
 
     // Periodic cleaning
     Timer timer2 = new Timer(true);
-    timer2.schedule(new TimerTask() {
-      @Override
-      public void run() {
-        cleanParametersFromAggregations();
-      }
-    }, AGGREGATION_CLEANING_INTERVAL * 1000, AGGREGATION_CLEANING_INTERVAL * 1000);
+    timer2.schedule(
+        new TimerTask() {
+          @Override
+          public void run() {
+            cleanParametersFromAggregations();
+          }
+        },
+        AGGREGATION_CLEANING_INTERVAL * 1000,
+        AGGREGATION_CLEANING_INTERVAL * 1000);
   }
 
-  /**
-   * Cleans all the aggregations that could have been defined by us in the Nanomind.
-   */
+  /** Cleans all the aggregations that could have been defined by us in the Nanomind. */
   public void cleanAllAggregations() {
     lock.lock();
     aggHandler.cleanAllAggregations();
@@ -176,10 +165,10 @@ public class NanomindParameterValuesProvider extends OBSWParameterValuesProvider
    * @param agg Information about the OBSW aggregation
    * @param identifier Name of the parameter the aggregation was requested for
    * @return Value of the parameter the aggregation was requested for, null if the aggregation value
-   *         passed is null
+   *     passed is null
    */
-  private Attribute retrieveValueAndUpdateCache(AggregationValue aggValue, OBSWAggregation agg,
-      Identifier identifier) {
+  private Attribute retrieveValueAndUpdateCache(
+      AggregationValue aggValue, OBSWAggregation agg, Identifier identifier) {
     // An error occured when fetching the parameter's aggregation value
     if (aggValue == null) {
       return null;
@@ -206,10 +195,10 @@ public class NanomindParameterValuesProvider extends OBSWParameterValuesProvider
 
   /**
    * Fetches a new value for the given parameter and updates it in the cache.
-   * 
+   *
    * @param identifier The parameter name
    * @return The value or null if the parameter is unknown or a problem occurred while fetching the
-   *         value
+   *     value
    */
   private Attribute getNewValue(Identifier identifier) {
     // Parameter is unknown

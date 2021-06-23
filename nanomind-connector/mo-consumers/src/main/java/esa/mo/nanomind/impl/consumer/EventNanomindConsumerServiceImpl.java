@@ -13,9 +13,9 @@
  * You on an "as is" basis and without warranties of any kind, including without
  * limitation merchantability, fitness for a particular purpose, absence of
  * defects or errors, accuracy or non-infringement of intellectual property rights.
- * 
+ *
  * See the License for the specific language governing permissions and
- * limitations under the License. 
+ * limitations under the License.
  * ----------------------------------------------------------------------------
  */
 package esa.mo.nanomind.impl.consumer;
@@ -50,39 +50,31 @@ import org.ccsds.moims.mo.mal.structures.UShort;
 import org.ccsds.moims.mo.mal.structures.UpdateHeaderList;
 import org.ccsds.moims.mo.mal.transport.MALMessageHeader;
 
-/**
- *
- * @author Cesar Coelho
- */
-public class EventNanomindConsumerServiceImpl extends ConsumerServiceImpl
-{
+/** @author Cesar Coelho */
+public class EventNanomindConsumerServiceImpl extends ConsumerServiceImpl {
 
-  private static final Logger LOGGER
-      = Logger.getLogger(EventNanomindConsumerServiceImpl.class.getName());
+  private static final Logger LOGGER =
+      Logger.getLogger(EventNanomindConsumerServiceImpl.class.getName());
 
   private final EventStub eventService;
   private final SubscriptionList subs = new SubscriptionList();
 
   @Override
-  public Object generateServiceStub(final MALConsumer tmConsumer)
-  {
+  public Object generateServiceStub(final MALConsumer tmConsumer) {
     return new EventStub(tmConsumer);
   }
 
   @Override
-  public Object getStub()
-  {
+  public Object getStub() {
     return this.getEventStub();
   }
 
-  public EventStub getEventStub()
-  {
+  public EventStub getEventStub() {
     return eventService;
   }
 
-  public EventNanomindConsumerServiceImpl(final SingleConnectionDetails connectionDetails) throws
-      MALException, MalformedURLException
-  {
+  public EventNanomindConsumerServiceImpl(final SingleConnectionDetails connectionDetails)
+      throws MALException, MalformedURLException {
     if (MALContextFactory.lookupArea(MALHelper.MAL_AREA_NAME, MALHelper.MAL_AREA_VERSION) == null) {
       MALHelper.init(MALContextFactory.getElementFactoryRegistry());
     }
@@ -108,35 +100,37 @@ public class EventNanomindConsumerServiceImpl extends ConsumerServiceImpl
       }
     }
 
-    tmConsumer = connection.startService(
-        this.connectionDetails.getProviderURI(),
-        this.connectionDetails.getBrokerURI(),
-        this.connectionDetails.getDomain(),
-        EventHelper.EVENT_SERVICE);
+    tmConsumer =
+        connection.startService(
+            this.connectionDetails.getProviderURI(),
+            this.connectionDetails.getBrokerURI(),
+            this.connectionDetails.getDomain(),
+            EventHelper.EVENT_SERVICE);
 
     this.eventService = new EventStub(tmConsumer);
   }
 
-  public void registerDefaultEventHandler() throws MALInteractionException, MALException
-  {
+  public void registerDefaultEventHandler() throws MALInteractionException, MALException {
 
     // Make the event adapter to call the eventReceivedListener when there's a new object available
-    class EventReceivedAdapter extends EventAdapter
-    {
+    class EventReceivedAdapter extends EventAdapter {
 
       @Override
-      public void monitorEventNotifyReceived(final MALMessageHeader msgHeader,
-                                             final Identifier lIdentifier, final UpdateHeaderList lUpdateHeaderList,
-                                             final ObjectDetailsList objectDetailsList, final ElementList elementList,
-                                             final Map qosProperties)
-      {
+      public void monitorEventNotifyReceived(
+          final MALMessageHeader msgHeader,
+          final Identifier lIdentifier,
+          final UpdateHeaderList lUpdateHeaderList,
+          final ObjectDetailsList objectDetailsList,
+          final ElementList elementList,
+          final Map qosProperties) {
         if (objectDetailsList.size() == lUpdateHeaderList.size()) {
           for (int i = 0; i < lUpdateHeaderList.size(); i++) {
 
             final Identifier entityKey1 = lUpdateHeaderList.get(i).getKey().getFirstSubKey();
             final Long entityKey2 = lUpdateHeaderList.get(i).getKey().getSecondSubKey();
             final Long entityKey3 = lUpdateHeaderList.get(i).getKey().getThirdSubKey();
-            final Long entityKey4 = lUpdateHeaderList.get(i).getKey().getFourthSubKey(); // ObjType of the source
+            final Long entityKey4 =
+                lUpdateHeaderList.get(i).getKey().getFourthSubKey(); // ObjType of the source
 
             // (UShort area, UShort service, UOctet version, UShort number)
             // (UShort area, UShort service, UOctet version, 0)
@@ -148,7 +142,7 @@ public class EventNanomindConsumerServiceImpl extends ConsumerServiceImpl
 
             // ----
             final EventCOMObject newEvent = new EventCOMObject();
-//                        newEvent.setDomain(msgHeader.getDomain());
+            //                        newEvent.setDomain(msgHeader.getDomain());
             newEvent.setDomain(connectionDetails.getDomain());
             newEvent.setObjType(objType);
             newEvent.setObjId(entityKey3);
@@ -167,17 +161,13 @@ public class EventNanomindConsumerServiceImpl extends ConsumerServiceImpl
     }
     // Register with the subscription key provided
     // FIXME: Causes an exception at SPPMessageHeader.java:115
-  //  this.getEventStub().monitorEventRegister(ConnectionConsumer.subscriptionWildcard(
-  //      new Identifier("SUB")), new EventReceivedAdapter());
+    //  this.getEventStub().monitorEventRegister(ConnectionConsumer.subscriptionWildcard(
+    //      new Identifier("SUB")), new EventReceivedAdapter());
   }
 
-  /**
-   * Closes the tmConsumer connection
-   *
-   */
+  /** Closes the tmConsumer connection */
   @Override
-  protected void closeConnection()
-  {
+  protected void closeConnection() {
     // Close old connection
     if (tmConsumer != null) {
       try {
@@ -191,8 +181,7 @@ public class EventNanomindConsumerServiceImpl extends ConsumerServiceImpl
           try {
             eventService.monitorEventDeregister(subLst);
           } catch (final MALInteractionException ex) {
-            LOGGER.log(Level.SEVERE,
-                null, ex);
+            LOGGER.log(Level.SEVERE, null, ex);
           }
         }
 
@@ -202,5 +191,4 @@ public class EventNanomindConsumerServiceImpl extends ConsumerServiceImpl
       }
     }
   }
-
 }

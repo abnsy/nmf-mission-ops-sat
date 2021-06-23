@@ -13,9 +13,9 @@
  * You on an "as is" basis and without warranties of any kind, including without
  * limitation merchantability, fitness for a particular purpose, absence of
  * defects or errors, accuracy or non-infringement of intellectual property rights.
- * 
+ *
  * See the License for the specific language governing permissions and
- * limitations under the License. 
+ * limitations under the License.
  * ----------------------------------------------------------------------------
  */
 package esa.mo.platform.impl.provider.opssat;
@@ -36,8 +36,7 @@ import org.ccsds.moims.mo.mal.structures.FloatList;
 import org.ccsds.moims.mo.platform.softwaredefinedradio.structures.IQComponents;
 import org.ccsds.moims.mo.platform.softwaredefinedradio.structures.SDRConfiguration;
 
-public class SDROPSSATAdapter implements SoftwareDefinedRadioAdapterInterface
-{
+public class SDROPSSATAdapter implements SoftwareDefinedRadioAdapterInterface {
 
   private static final Logger LOGGER = Logger.getLogger(SDROPSSATAdapter.class.getName());
   private static final float FREQ_MATCH_EPSILON = (float) 0.01; // 0.01 MHz = 10 kHz
@@ -50,8 +49,7 @@ public class SDROPSSATAdapter implements SoftwareDefinedRadioAdapterInterface
   private final boolean initialized;
   private boolean configured;
 
-  public SDROPSSATAdapter()
-  {
+  public SDROPSSATAdapter() {
     LOGGER.log(Level.INFO, "Initialisation");
     samplingFreqsMap = new TreeMap<>();
     samplingFreqsMap.put((float) 1.50, eSDR_RFFE_RX_SAMPLING_FREQ.RFFE_RX_SAMPLING_1M5);
@@ -108,13 +106,11 @@ public class SDROPSSATAdapter implements SoftwareDefinedRadioAdapterInterface
   }
 
   @Override
-  public boolean isUnitAvailable()
-  {
+  public boolean isUnitAvailable() {
     return initialized;
   }
 
-  private eSDR_RFFE_RX_SAMPLING_FREQ getSamplingFreqFromFloat(final float input)
-  {
+  private eSDR_RFFE_RX_SAMPLING_FREQ getSamplingFreqFromFloat(final float input) {
     final Iterator it = samplingFreqsMap.entrySet().iterator();
     while (it.hasNext()) {
       final Map.Entry<Float, eSDR_RFFE_RX_SAMPLING_FREQ> pair = (Map.Entry) it.next();
@@ -125,8 +121,7 @@ public class SDROPSSATAdapter implements SoftwareDefinedRadioAdapterInterface
     return null;
   }
 
-  private eSDR_RFFE_RX_LPF_BW getLPFFreqFromFloat(final float input)
-  {
+  private eSDR_RFFE_RX_LPF_BW getLPFFreqFromFloat(final float input) {
     final Iterator it = lpfFreqsMap.entrySet().iterator();
     while (it.hasNext()) {
       final Map.Entry<Float, eSDR_RFFE_RX_LPF_BW> pair = (Map.Entry) it.next();
@@ -138,14 +133,15 @@ public class SDROPSSATAdapter implements SoftwareDefinedRadioAdapterInterface
   }
 
   @Override
-  public boolean setConfiguration(final SDRConfiguration configuration)
-  {
+  public boolean setConfiguration(final SDRConfiguration configuration) {
     LOGGER.log(Level.INFO, "Setting SDR configuration: {0}", configuration);
-    final eSDR_RFFE_RX_SAMPLING_FREQ samplingFreq = getSamplingFreqFromFloat(
-        configuration.getRxSamplingFrequency());
+    final eSDR_RFFE_RX_SAMPLING_FREQ samplingFreq =
+        getSamplingFreqFromFloat(configuration.getRxSamplingFrequency());
     final eSDR_RFFE_RX_LPF_BW lpfBw = getLPFFreqFromFloat(configuration.getRxLowPassBW());
     if (samplingFreq == null) {
-      LOGGER.log(Level.WARNING, "Unsupported sampling frequency provided: {0} MHz",
+      LOGGER.log(
+          Level.WARNING,
+          "Unsupported sampling frequency provided: {0} MHz",
           configuration.getRxSamplingFrequency());
       return false;
     }
@@ -155,7 +151,8 @@ public class SDROPSSATAdapter implements SoftwareDefinedRadioAdapterInterface
       sdrApi.Set_RX_Sampling_Frequency(samplingFreq);
       sdrApi.Set_RXLPF_Bandwidth(lpfBw);
       sdrApi.Calibrate_RF_Frontend();
-      // This will allocate plenty of memory, allowing to store samples from 0.1 second. Each sample pair is 2 x uint32
+      // This will allocate plenty of memory, allowing to store samples from 0.1 second. Each sample
+      // pair is 2 x uint32
       bufferLength = (int) (configuration.getRxSamplingFrequency() * 100000);
       bufferSize = bufferLength * 8;
       sampleBuffer = ByteBuffer.allocateDirect(bufferSize);
@@ -168,8 +165,7 @@ public class SDROPSSATAdapter implements SoftwareDefinedRadioAdapterInterface
   }
 
   @Override
-  public boolean enableSDR(final Boolean enable)
-  {
+  public boolean enableSDR(final Boolean enable) {
     LOGGER.log(Level.INFO, "EnableSDR: {0}", enable);
     if (!configured) {
       return false;
@@ -184,8 +180,7 @@ public class SDROPSSATAdapter implements SoftwareDefinedRadioAdapterInterface
   }
 
   @Override
-  public IQComponents getIQComponents()
-  {
+  public IQComponents getIQComponents() {
     if (!configured) {
       return null;
     }
