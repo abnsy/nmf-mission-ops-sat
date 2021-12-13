@@ -1705,7 +1705,7 @@ public class SPPEncoderTest {
     encoder.encodeFineTime(
         new FineTime(
             4451696123456789012L)); // 2013-02-21T12:34:56.123456789012 = MAL_FINE_TIME_EPOCH
-                                    // (2013-01-01T00:00:00) + ...
+    // (2013-01-01T00:00:00) + ...
     assertArrayEquals(
         new byte[] { // 4451696, 135742175047
           (byte) 0x43,
@@ -1730,7 +1730,7 @@ public class SPPEncoderTest {
     encoder.encodeFineTime(
         new FineTime(
             4451696987654321098L)); // 2013-02-21T12:34:56.987654321098 = MAL_FINE_TIME_EPOCH
-                                    // (2013-01-01T00:00:00) + ...
+    // (2013-01-01T00:00:00) + ...
     assertArrayEquals(
         new byte[] { // 4451696, 1085937410270
           0,
@@ -1773,7 +1773,7 @@ public class SPPEncoderTest {
         new FineTime(
             4451696123456789012L
                 + 35000000000000L)); // 2013-02-21T12:34:56.123456789012 = MAL_FINE_TIME_EPOCH
-                                     // (2013-01-01T00:00:00) + ...
+    // (2013-01-01T00:00:00) + ...
     assertArrayEquals(
         new byte[] { // 51, 45296.123, 456789012
           (byte) 0,
@@ -1797,7 +1797,7 @@ public class SPPEncoderTest {
         new FineTime(
             4451696987654321098L
                 + 35000000000000L)); // 2013-02-21T12:34:56.987654321098 = MAL_FINE_TIME_EPOCH
-                                     // (2013-01-01T00:00:00) + ...
+    // (2013-01-01T00:00:00) + ...
     assertArrayEquals(
         new byte[] { // 51, 45296.987, 654321098
           (byte) 0,
@@ -1821,7 +1821,7 @@ public class SPPEncoderTest {
         new FineTime(
             4451696987654321098L
                 + 35000000000000L)); // 2013-02-21T12:34:56.987654321098 = MAL_FINE_TIME_EPOCH
-                                     // (2013-01-01T00:00:00) + ...
+    // (2013-01-01T00:00:00) + ...
     assertArrayEquals(
         new byte[] {(byte) 0x07, (byte) 0xDD, 2, 21, 12, 34, 56, 98, 76, 54, 32, 10, 98},
         outputStream.toByteArray());
@@ -1834,7 +1834,7 @@ public class SPPEncoderTest {
         new FineTime(
             4451696123456789012L
                 + 35000000000000L)); // 2013-02-21T12:34:56.123456789012 = MAL_FINE_TIME_EPOCH
-                                     // (2013-01-01T00:00:00) + ...
+    // (2013-01-01T00:00:00) + ...
     assertArrayEquals(
         new byte[] { // DOY 52
           (byte) 0x07, (byte) 0xDD, (byte) 0x00, (byte) 52, 12, 34, 56, 12, 34, 56, 78, 90, 12

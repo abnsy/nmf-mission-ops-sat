@@ -39,9 +39,8 @@ public class CCSDSTime {
   private static final String WRONG_TIME_FORMAT = "Wrong time format specification.";
   private static final String NEGATIVE_TIME = "Time before epoch not allowed.";
   // TODO: Allow automatic download and/or manual definition of leap second file.
-  private static final String OREKIT_UTC_TAI_FILE =
-      "UTC-TAI.zip"; // contains UTC-TAI.history from
-                     // https://hpiers.obspm.fr/eoppc/bul/bulc/UTC-TAI.history
+  private static final String OREKIT_UTC_TAI_FILE = "UTC-TAI.zip"; // contains UTC-TAI.history from
+  // https://hpiers.obspm.fr/eoppc/bul/bulc/UTC-TAI.history
   private byte[] pField;
   private AbsoluteDate epoch;
   private int nOctets;
