@@ -1,4 +1,4 @@
-/* 
+/*
  * MAL/SPP Binding for CCSDS Mission Operations Framework
  * Copyright (C) 2015 Deutsches Zentrum für Luft- und Raumfahrt e.V. (DLR).
  *
@@ -28,18 +28,24 @@ import org.ccsds.moims.mo.mal.transport.MALNotifyBody;
 
 public class SPPNotifyBody extends SPPPublishBody implements MALNotifyBody {
 
-    public SPPNotifyBody(final Object[] bodyElements, final MALElementStreamFactory esf, final MALEncodingContext ctx) {
-        super(bodyElements, esf, ctx);
-        idx = 1;
-    }
+  public SPPNotifyBody(
+      final Object[] bodyElements,
+      final MALElementStreamFactory esf,
+      final MALEncodingContext ctx) {
+    super(bodyElements, esf, ctx);
+    idx = 1;
+  }
 
-    public SPPNotifyBody(final MALEncodedBody encodedBody, final MALElementStreamFactory esf, final MALEncodingContext ctx) {
-        super(encodedBody, esf, ctx);
-        idx = 1;
-    }
+  public SPPNotifyBody(
+      final MALEncodedBody encodedBody,
+      final MALElementStreamFactory esf,
+      final MALEncodingContext ctx) {
+    super(encodedBody, esf, ctx);
+    idx = 1;
+  }
 
-    @Override
-    public Identifier getSubscriptionId() throws MALException {
-        return (Identifier) getBodyElement(0, new Identifier());
-    }
+  @Override
+  public Identifier getSubscriptionId() throws MALException {
+    return (Identifier) getBodyElement(0, new Identifier());
+  }
 }

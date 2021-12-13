@@ -1,4 +1,4 @@
-/* 
+/*
  * MAL/SPP Binding for CCSDS Mission Operations Framework
  * Copyright (C) 2015 Deutsches Zentrum für Luft- und Raumfahrt e.V. (DLR).
  *
@@ -27,27 +27,27 @@ import org.ccsds.moims.mo.mal.MALListDecoder;
 
 public class SPPListDecoder extends SPPDecoder implements MALListDecoder {
 
-    private final List list;
-    private final int size;
+  private final List list;
+  private final int size;
 
-    public SPPListDecoder(final InputStream inputStream, final List list, final Map properties) throws MALException {
-        super(inputStream, properties);
-        final long listSize = decodeUInteger().getValue();
-        if (listSize > Integer.MAX_VALUE) {
-            throw new MALException(LENGTH_NOT_SUPPORTED);
-        }
-        this.size = (int) listSize;
-        this.list = list;
+  public SPPListDecoder(final InputStream inputStream, final List list, final Map properties)
+      throws MALException {
+    super(inputStream, properties);
+    final long listSize = decodeUInteger().getValue();
+    if (listSize > Integer.MAX_VALUE) {
+      throw new MALException(LENGTH_NOT_SUPPORTED);
     }
+    this.size = (int) listSize;
+    this.list = list;
+  }
 
-    @Override
-    public boolean hasNext() {
-        return list.size() < size;
-    }
+  @Override
+  public boolean hasNext() {
+    return list.size() < size;
+  }
 
-    @Override
-    public int size() {
-        return size;
-    }
-
+  @Override
+  public int size() {
+    return size;
+  }
 }

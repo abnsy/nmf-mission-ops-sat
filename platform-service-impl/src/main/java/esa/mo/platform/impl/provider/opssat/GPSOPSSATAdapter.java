@@ -13,13 +13,16 @@
  * You on an "as is" basis and without warranties of any kind, including without
  * limitation merchantability, fitness for a particular purpose, absence of
  * defects or errors, accuracy or non-infringement of intellectual property rights.
- * 
+ *
  * See the License for the specific language governing permissions and
- * limitations under the License. 
+ * limitations under the License.
  * ----------------------------------------------------------------------------
  */
 package esa.mo.platform.impl.provider.opssat;
 
+import esa.mo.nanomind.impl.util.NanomindServicesConsumer;
+import esa.mo.platform.impl.provider.gen.GPSNMEAonlyAdapter;
+import esa.opssat.nanomind.opssat_pf.gps.consumer.GPSAdapter;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -28,21 +31,13 @@ import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
 import org.ccsds.moims.mo.mal.MALException;
 import org.ccsds.moims.mo.mal.MALInteractionException;
 import org.ccsds.moims.mo.mal.structures.Blob;
 import org.ccsds.moims.mo.platform.gps.structures.TwoLineElementSet;
 import org.orekit.propagation.analytical.tle.TLE;
 
-import esa.mo.nanomind.impl.util.NanomindServicesConsumer;
-import esa.mo.platform.impl.provider.gen.GPSNMEAonlyAdapter;
-import esa.opssat.nanomind.opssat_pf.gps.consumer.GPSAdapter;
-
-/**
- *
- * @author Cesar Coelho
- */
+/** @author Cesar Coelho */
 public class GPSOPSSATAdapter extends GPSNMEAonlyAdapter {
   private static final int GET_GPS_TIMEOUT_MS = 4000;
   private static final Logger LOGGER = Logger.getLogger(GPSOPSSATAdapter.class.getName());
@@ -60,13 +55,15 @@ public class GPSOPSSATAdapter extends GPSNMEAonlyAdapter {
     LOGGER.log(Level.FINE, "run getNMEASentence with \"{0}\"", identifier);
     GPSHandler gpsHandler = new GPSHandler();
     try {
-      obcServicesConsumer.getGPSNanomindService().getGPSNanomindStub().getGPSData(new Blob(identifier.getBytes()),
-          gpsHandler);
+      obcServicesConsumer
+          .getGPSNanomindService()
+          .getGPSNanomindStub()
+          .getGPSData(new Blob(identifier.getBytes()), gpsHandler);
     } catch (MALInteractionException | MALException ex) {
       throw new IOException("Error when retrieving GPS NMEA response from Nanomind", ex);
     }
     try {
-      if(gpsHandler.lock.tryAcquire(GET_GPS_TIMEOUT_MS, TimeUnit.MILLISECONDS)) {
+      if (gpsHandler.lock.tryAcquire(GET_GPS_TIMEOUT_MS, TimeUnit.MILLISECONDS)) {
         return gpsHandler.response;
       } else {
         throw new IOException("Internal timeout when retrieving GPS NMEA response from Nanomind");
@@ -77,13 +74,11 @@ public class GPSOPSSATAdapter extends GPSNMEAonlyAdapter {
   }
 
   @Override
-  public boolean isUnitAvailable()
-  {
+  public boolean isUnitAvailable() {
     return true;
   }
 
-  public String getTLESentence() throws IOException
-  {
+  public String getTLESentence() throws IOException {
     // read TLE from file
     File file = new File(TLE_LOCATION);
 
@@ -99,8 +94,7 @@ public class GPSOPSSATAdapter extends GPSNMEAonlyAdapter {
   }
 
   @Override
-  public TwoLineElementSet getTLE()
-  {
+  public TwoLineElementSet getTLE() {
     String content = "";
     try {
       content = this.getTLESentence();
@@ -111,10 +105,10 @@ public class GPSOPSSATAdapter extends GPSNMEAonlyAdapter {
     String line1;
     String line2;
 
-    //split TLE into two main lines
+    // split TLE into two main lines
     switch (lines.length) {
       case 3:
-        //if header line exists, discard it
+        // if header line exists, discard it
         line1 = lines[1];
         line2 = lines[2];
         break;
@@ -123,36 +117,46 @@ public class GPSOPSSATAdapter extends GPSNMEAonlyAdapter {
         line2 = lines[1];
         break;
       default:
-        LOGGER.log(Level.SEVERE,
-            "TLE is empty or wrongly formatet. TLE:{0}{1}", new Object[]{System.lineSeparator(),
-              Arrays.toString(lines)});
+        LOGGER.log(
+            Level.SEVERE,
+            "TLE is empty or wrongly formatet. TLE:{0}{1}",
+            new Object[] {System.lineSeparator(), Arrays.toString(lines)});
         return null;
     }
 
     TLE tle = new TLE(line1, line2);
 
-    return new TwoLineElementSet(tle.getSatelliteNumber(), "" + tle.getClassification(),
-        tle.getLaunchYear(), tle.getLaunchNumber(), tle.getLaunchPiece(),
+    return new TwoLineElementSet(
+        tle.getSatelliteNumber(),
+        "" + tle.getClassification(),
+        tle.getLaunchYear(),
+        tle.getLaunchNumber(),
+        tle.getLaunchPiece(),
         tle.getDate().getComponents(0).getDate().getYear(),
         tle.getDate().getComponents(0).getDate().getDayOfYear(),
         tle.getDate().getComponents(0).getTime().getSecondsInUTCDay(),
-        tle.getMeanMotionFirstDerivative(), tle.getMeanMotionSecondDerivative(),
-        tle.getBStar(), tle.getElementNumber(), tle.getI(), tle.getRaan(), tle.getE(),
-        tle.getPerigeeArgument(), tle.getMeanAnomaly(), tle.getMeanMotion(),
+        tle.getMeanMotionFirstDerivative(),
+        tle.getMeanMotionSecondDerivative(),
+        tle.getBStar(),
+        tle.getElementNumber(),
+        tle.getI(),
+        tle.getRaan(),
+        tle.getE(),
+        tle.getPerigeeArgument(),
+        tle.getMeanAnomaly(),
+        tle.getMeanMotion(),
         tle.getRevolutionNumberAtEpoch());
-
   }
 
-  private class GPSHandler extends GPSAdapter
-  {
+  private class GPSHandler extends GPSAdapter {
     final Semaphore lock = new Semaphore(0);
     String response = "";
 
     @Override
     public void getGPSDataResponseReceived(
         org.ccsds.moims.mo.mal.transport.MALMessageHeader msgHeader,
-        org.ccsds.moims.mo.mal.structures.Blob data, java.util.Map qosProperties)
-    {
+        org.ccsds.moims.mo.mal.structures.Blob data,
+        java.util.Map qosProperties) {
       try {
         response = new String(data.getValue());
       } catch (MALException ex) {

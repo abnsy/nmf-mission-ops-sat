@@ -13,9 +13,9 @@
  * You on an "as is" basis and without warranties of any kind, including without
  * limitation merchantability, fitness for a particular purpose, absence of
  * defects or errors, accuracy or non-infringement of intellectual property rights.
- * 
+ *
  * See the License for the specific language governing permissions and
- * limitations under the License. 
+ * limitations under the License.
  * ----------------------------------------------------------------------------
  */
 package esa.mo.nanomind.impl.parameters_provisioning;
@@ -29,19 +29,13 @@ import org.ccsds.moims.mo.mal.structures.Attribute;
  * @author Tanguy Soto
  */
 class TimedAttributeValue {
-  /**
-   * The latest value
-   */
+  /** The latest value */
   private Attribute value;
 
-  /**
-   * The latest update time of value
-   */
+  /** The latest update time of value */
   private Date lastUpdateTime;
 
-  /**
-   * The latest request time of value
-   */
+  /** The latest request time of value */
   private Date lastRequestTime;
 
   /**
@@ -55,16 +49,14 @@ class TimedAttributeValue {
     lastRequestTime = lastUpdateTime;
   }
 
-  /**
-   * @return The latest value
-   */
+  /** @return The latest value */
   public Attribute getValue() {
     return value;
   }
 
   /**
    * Sets the value and updates the latest update time.
-   * 
+   *
    * @param value the new value to set
    */
   public void setValue(Attribute value) {
@@ -74,7 +66,7 @@ class TimedAttributeValue {
 
   /**
    * Returns the latest update time of this value.
-   * 
+   *
    * @return a Date containing the latest update time
    */
   public Date getLastUpdateTime() {
@@ -90,7 +82,7 @@ class TimedAttributeValue {
 
   /**
    * Returns the latest request time of this value.
-   * 
+   *
    * @return a Date containing the latest request time
    */
   public Date getLastRequestTime() {

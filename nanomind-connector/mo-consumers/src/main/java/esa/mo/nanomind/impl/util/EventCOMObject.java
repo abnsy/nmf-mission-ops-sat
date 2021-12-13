@@ -13,9 +13,9 @@
  * You on an "as is" basis and without warranties of any kind, including without
  * limitation merchantability, fitness for a particular purpose, absence of
  * defects or errors, accuracy or non-infringement of intellectual property rights.
- * 
+ *
  * See the License for the specific language governing permissions and
- * limitations under the License. 
+ * limitations under the License.
  * ----------------------------------------------------------------------------
  */
 package esa.mo.nanomind.impl.util;
@@ -36,8 +36,7 @@ import org.ccsds.moims.mo.mal.structures.URI;
  *
  * @author Cesar Coelho
  */
-public class EventCOMObject
-{
+public class EventCOMObject {
 
   private IdentifierList domain;
   private ObjectType objType;
@@ -51,14 +50,18 @@ public class EventCOMObject
   private Identifier networkZone;
   private URI sourceURI;
 
-  public EventCOMObject()
-  {
-  }
+  public EventCOMObject() {}
 
-  public EventCOMObject(final IdentifierList domain, final ObjectType objType,
-      final Long objId, final ObjectId source, final Long related, final Element body,
-      final Time timestamp, final Identifier networkZone, final URI sourceURI)
-  {
+  public EventCOMObject(
+      final IdentifierList domain,
+      final ObjectType objType,
+      final Long objId,
+      final ObjectId source,
+      final Long related,
+      final Element body,
+      final Time timestamp,
+      final Identifier networkZone,
+      final URI sourceURI) {
     this.domain = domain;
     this.objType = objType;
     this.objId = objId;
@@ -72,109 +75,95 @@ public class EventCOMObject
     this.sourceURI = sourceURI;
   }
 
-  public IdentifierList getDomain()
-  {
+  public IdentifierList getDomain() {
     return domain;
   }
 
-  public ObjectType getObjType()
-  {
+  public ObjectType getObjType() {
     return objType;
   }
 
-  public Long getObjId()
-  {
+  public Long getObjId() {
     return objId;
   }
 
-  public ObjectId getSource()
-  {
+  public ObjectId getSource() {
     return source;
   }
 
-  public Long getRelated()
-  {
+  public Long getRelated() {
     return related;
   }
 
-  public Element getBody()
-  {
+  public Element getBody() {
     return body;
   }
 
-  public Time getTimestamp()
-  {
+  public Time getTimestamp() {
     return timestamp;
   }
 
-  public Identifier getNetworkZone()
-  {
+  public Identifier getNetworkZone() {
     return networkZone;
   }
 
-  public URI getSourceURI()
-  {
+  public URI getSourceURI() {
     return sourceURI;
   }
 
-  public void setDomain(final IdentifierList domain)
-  {
+  public void setDomain(final IdentifierList domain) {
     this.domain = domain;
   }
 
-  public void setObjType(final ObjectType objType)
-  {
+  public void setObjType(final ObjectType objType) {
     this.objType = objType;
   }
 
-  public void setObjId(final Long objId)
-  {
+  public void setObjId(final Long objId) {
     this.objId = objId;
   }
 
-  public void setSource(final ObjectId source)
-  {
+  public void setSource(final ObjectId source) {
     this.source = source;
   }
 
-  public void setRelated(final Long related)
-  {
+  public void setRelated(final Long related) {
     this.related = related;
   }
 
-  public void setBody(final Element body)
-  {
+  public void setBody(final Element body) {
     this.body = body;
   }
 
-  public void setTimestamp(final Time timestamp)
-  {
+  public void setTimestamp(final Time timestamp) {
     this.timestamp = timestamp;
   }
 
-  public void setNetworkZone(final Identifier networkZone)
-  {
+  public void setNetworkZone(final Identifier networkZone) {
     this.networkZone = networkZone;
   }
 
-  public void setSourceURI(final URI sourceURI)
-  {
+  public void setSourceURI(final URI sourceURI) {
     this.sourceURI = sourceURI;
   }
 
-  public ObjectId getObjectId()
-  {
+  public ObjectId getObjectId() {
     return new ObjectId(this.objType, new ObjectKey(this.domain, this.objId));
   }
 
   @Override
-  public String toString()
-  {
+  public String toString() {
     return MessageFormat.format(
         "EventCOMObject: domain={1}, objType={2}, objId={3}, source={4}, related={5}"
-        + ", body={6}, timestamp={7}, networkZone={8}, sourceURI={9}",
-        HelperMisc.domain2domainId(domain), objType, objId, source, related, body, timestamp,
-        networkZone, sourceURI);
+            + ", body={6}, timestamp={7}, networkZone={8}, sourceURI={9}",
+        HelperMisc.domain2domainId(domain),
+        objType,
+        objId,
+        source,
+        related,
+        body,
+        timestamp,
+        networkZone,
+        sourceURI);
   }
-
 }

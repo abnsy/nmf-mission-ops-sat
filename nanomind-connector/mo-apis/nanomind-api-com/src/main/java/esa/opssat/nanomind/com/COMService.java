@@ -13,31 +13,27 @@
  * You on an "as is" basis and without warranties of any kind, including without
  * limitation merchantability, fitness for a particular purpose, absence of
  * defects or errors, accuracy or non-infringement of intellectual property rights.
- * 
+ *
  * See the License for the specific language governing permissions and
- * limitations under the License. 
+ * limitations under the License.
  * ----------------------------------------------------------------------------
  */
 package esa.opssat.nanomind.com;
 
-import org.ccsds.moims.mo.com.Proposed;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
+import org.ccsds.moims.mo.com.Proposed;
 import org.ccsds.moims.mo.mal.MALService;
 import org.ccsds.moims.mo.mal.structures.Identifier;
 import org.ccsds.moims.mo.mal.structures.UShort;
 
-/**
- *
- */
-public class COMService extends MALService
-{
+/** */
+public class COMService extends MALService {
   private final Map<Integer, COMObject> objectsByNumber = new HashMap<>();
   private final Map<String, COMObject> objectsByName = new HashMap<>();
-  
-  public COMService(final UShort number, final Identifier name)
-  {
+
+  public COMService(final UShort number, final Identifier name) {
     super(number, name);
   }
 
@@ -48,8 +44,7 @@ public class COMService extends MALService
    * @throws java.lang.IllegalArgumentException If the argument is null.
    */
   @Proposed
-  public void addCOMObject(final COMObject object) throws java.lang.IllegalArgumentException
-  {
+  public void addCOMObject(final COMObject object) throws java.lang.IllegalArgumentException {
     objectsByNumber.put(object.getObjectType().getNumber().getValue(), object);
     objectsByName.put(object.getObjectName().getValue(), object);
   }
@@ -60,8 +55,7 @@ public class COMService extends MALService
    * @param opNumber The number of the object.
    * @return The found operation or null.
    */
-  public COMObject getObjectByNumber(final UShort opNumber)
-  {
+  public COMObject getObjectByNumber(final UShort opNumber) {
     return objectsByNumber.get(opNumber.getValue());
   }
 
@@ -71,8 +65,7 @@ public class COMService extends MALService
    * @param opName The name of the object.
    * @return The found operation or null.
    */
-  public COMObject getObjectByName(final Identifier opName)
-  {
+  public COMObject getObjectByName(final Identifier opName) {
     return objectsByName.get(opName.getValue());
   }
 
@@ -81,8 +74,7 @@ public class COMService extends MALService
    *
    * @return The set of objects or an empty array if none defined.
    */
-  public COMObject[] getObjects()
-  {
+  public COMObject[] getObjects() {
     return (COMObject[]) Arrays.asList(objectsByName.values()).toArray();
   }
 }

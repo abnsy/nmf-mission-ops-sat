@@ -13,17 +13,17 @@
  * You on an "as is" basis and without warranties of any kind, including without
  * limitation merchantability, fitness for a particular purpose, absence of
  * defects or errors, accuracy or non-infringement of intellectual property rights.
- * 
+ *
  * See the License for the specific language governing permissions and
- * limitations under the License. 
+ * limitations under the License.
  * ----------------------------------------------------------------------------
  */
 package esa.mo.platform.impl.provider.opssat;
 
 import at.tugraz.ihf.opssat.ims100.bst_ims100_img_config_t;
 import at.tugraz.ihf.opssat.ims100.bst_ims100_img_t;
-import at.tugraz.ihf.opssat.ims100.bst_ret_t;
 import at.tugraz.ihf.opssat.ims100.bst_ims100_tele_std_t;
+import at.tugraz.ihf.opssat.ims100.bst_ret_t;
 import at.tugraz.ihf.opssat.ims100.ims100_api;
 import esa.mo.helpertools.helpers.HelperTime;
 import esa.mo.platform.impl.provider.gen.CameraAdapterInterface;
@@ -47,12 +47,8 @@ import org.ccsds.moims.mo.platform.camera.structures.PictureFormatList;
 import org.ccsds.moims.mo.platform.camera.structures.PixelResolution;
 import org.ccsds.moims.mo.platform.camera.structures.PixelResolutionList;
 
-/**
- *
- * @author Cesar Coelho
- */
-public class CameraOPSSATAdapter implements CameraAdapterInterface
-{
+/** @author Cesar Coelho */
+public class CameraOPSSATAdapter implements CameraAdapterInterface {
 
   private static final String SERIAL_PORT_ATTRIBUTE = "opssat.camera.port";
   private static final String SERIAL_PORT_DEFAULT = "/dev/ttyACM0";
@@ -74,8 +70,7 @@ public class CameraOPSSATAdapter implements CameraAdapterInterface
 
   private static final Logger LOGGER = Logger.getLogger(CameraOPSSATAdapter.class.getName());
 
-  public CameraOPSSATAdapter()
-  {
+  public CameraOPSSATAdapter() {
     supportedFormats.add(PictureFormat.RAW);
     supportedFormats.add(PictureFormat.RGB24);
     supportedFormats.add(PictureFormat.BMP);
@@ -85,8 +80,7 @@ public class CameraOPSSATAdapter implements CameraAdapterInterface
     try {
       System.loadLibrary("ims100_api_jni");
     } catch (final Exception ex) {
-      LOGGER.log(Level.SEVERE,
-          "Camera library could not be loaded!", ex);
+      LOGGER.log(Level.SEVERE, "Camera library could not be loaded!", ex);
       unitAvailable = false;
       return;
     }
@@ -94,8 +88,7 @@ public class CameraOPSSATAdapter implements CameraAdapterInterface
     try {
       this.initBSTCamera();
     } catch (final IOException ex) {
-      LOGGER.log(Level.SEVERE,
-          "BST Camera adapter could not be initialized!", ex);
+      LOGGER.log(Level.SEVERE, "BST Camera adapter could not be initialized!", ex);
       unitAvailable = false;
       return;
     }
@@ -104,17 +97,15 @@ public class CameraOPSSATAdapter implements CameraAdapterInterface
   }
 
   @Override
-  public boolean isUnitAvailable()
-  {
+  public boolean isUnitAvailable() {
     return unitAvailable;
   }
 
-  private void initBSTCamera() throws IOException
-  {
+  private void initBSTCamera() throws IOException {
     serialPort = System.getProperty(SERIAL_PORT_ATTRIBUTE, SERIAL_PORT_DEFAULT);
     blockDevice = System.getProperty(BLOCK_DEVICE_ATTRIBUTE, BLOCK_DEVICE_DEFAULT);
-    useWatchdog = Boolean.parseBoolean(System.getProperty(USE_WATCHDOG_ATTRIBUTE,
-        USE_WATCHDOG_DEFAULT));
+    useWatchdog =
+        Boolean.parseBoolean(System.getProperty(USE_WATCHDOG_ATTRIBUTE, USE_WATCHDOG_DEFAULT));
     final bst_ret_t ret = ims100_api.bst_ims100_init(serialPort, blockDevice, useWatchdog ? 1 : 0);
     // FIXME: For now it always returns false?!?!?
     /*if (ret != bst_ret_t.BST_RETURN_SUCCESS) {
@@ -127,62 +118,63 @@ public class CameraOPSSATAdapter implements CameraAdapterInterface
     nativeImageLength = imageConfig.getRow_end() - imageConfig.getRow_start() + 1;
   }
 
-  private synchronized void dumpHKTelemetry()
-  {
+  private synchronized void dumpHKTelemetry() {
     final bst_ims100_tele_std_t stdTM = new bst_ims100_tele_std_t();
     ims100_api.bst_ims100_get_tele_std(stdTM);
-    LOGGER.log(Level.INFO,
-        String.format("Dumping HK Telemetry...\n"
-            + "Standard TM:\n"
-            + "Version: %s\n"
-            + "Temp: %d degC\n"
-            + "Status byte: 0x%02X",
-            stdTM.getVersion(),
-            (int) stdTM.getTemp(),
-            stdTM.getStatus()));
+    LOGGER.log(
+        Level.INFO,
+        String.format(
+            "Dumping HK Telemetry...\n"
+                + "Standard TM:\n"
+                + "Version: %s\n"
+                + "Temp: %d degC\n"
+                + "Status byte: 0x%02X",
+            stdTM.getVersion(), (int) stdTM.getTemp(), stdTM.getStatus()));
   }
 
   @Override
-  public String getExtraInfo()
-  {
+  public String getExtraInfo() {
     return "";
   }
 
   @Override
-  public PixelResolutionList getAvailableResolutions()
-  {
+  public PixelResolutionList getAvailableResolutions() {
     final PixelResolutionList availableResolutions = new PixelResolutionList();
-    availableResolutions.add(new PixelResolution(new UInteger(nativeImageWidth), new UInteger(
-        nativeImageLength)));
+    availableResolutions.add(
+        new PixelResolution(new UInteger(nativeImageWidth), new UInteger(nativeImageLength)));
 
     return availableResolutions;
   }
 
   @Override
-  public synchronized Picture getPicturePreview() throws IOException
-  {
-    final PixelResolution resolution = new PixelResolution(new UInteger(nativeImageWidth),
-        new UInteger(nativeImageLength));
-    return takePicture(new CameraSettings(resolution, PictureFormat.RAW, PREVIEW_EXPOSURE_TIME,
-        PREVIEW_GAIN, PREVIEW_GAIN, PREVIEW_GAIN));
-
+  public synchronized Picture getPicturePreview() throws IOException {
+    final PixelResolution resolution =
+        new PixelResolution(new UInteger(nativeImageWidth), new UInteger(nativeImageLength));
+    return takePicture(
+        new CameraSettings(
+            resolution,
+            PictureFormat.RAW,
+            PREVIEW_EXPOSURE_TIME,
+            PREVIEW_GAIN,
+            PREVIEW_GAIN,
+            PREVIEW_GAIN));
   }
 
   @Override
-  public synchronized Picture takeAutoExposedPicture(final CameraSettings settings) throws IOException,
-      MALException
-  {
+  public synchronized Picture takeAutoExposedPicture(final CameraSettings settings)
+      throws IOException, MALException {
     final Duration defaultExposure = new Duration(0.1);
-    final double F = 4;// f^2 value of ops-sat camera
+    final double F = 4; // f^2 value of ops-sat camera
     final double EV = Math.log(F / defaultExposure.getValue()) / Math.log(2);
 
-    final CameraSettings tmpSettings = new CameraSettings(settings.getResolution(), PictureFormat.RAW,
-        defaultExposure, 1.0f, 1.0f, 1.0f);
+    final CameraSettings tmpSettings =
+        new CameraSettings(
+            settings.getResolution(), PictureFormat.RAW, defaultExposure, 1.0f, 1.0f, 1.0f);
     LOGGER.log(Level.INFO, "take sample picture");
     final Picture initialPicture = takePicture(tmpSettings);
 
-    final BufferedImage image = OPSSATCameraDebayering.getDebayeredImage(
-        initialPicture.getContent().getValue());
+    final BufferedImage image =
+        OPSSATCameraDebayering.getDebayeredImage(initialPicture.getContent().getValue());
 
     final int w = (int) settings.getResolution().getWidth().getValue();
     final int h = (int) settings.getResolution().getHeight().getValue();
@@ -194,7 +186,7 @@ public class CameraOPSSATAdapter implements CameraAdapterInterface
       final int green = (color >>> 8) & 0xFF;
       final int blue = color & 0xFF; // shift by 0
 
-      //calc luminance using sRGB luminance constants
+      // calc luminance using sRGB luminance constants
       luminanceSum += (red * 0.2126 + green * 0.7152 + blue * 0.0722) / 255;
     }
 
@@ -202,9 +194,7 @@ public class CameraOPSSATAdapter implements CameraAdapterInterface
     luminanceSum /= w * h;
 
     final double optimal_EV =
-        EV
-        + (Math.log(luminanceSum) / Math.log(2))
-        - (Math.log(0.5) / Math.log(2));
+        EV + (Math.log(luminanceSum) / Math.log(2)) - (Math.log(0.5) / Math.log(2));
 
     final double optimalExposureTime = F * Math.pow(2, -optimal_EV);
     LOGGER.log(Level.INFO, "normalised Luminance = {0}", luminanceSum);
@@ -216,8 +206,7 @@ public class CameraOPSSATAdapter implements CameraAdapterInterface
   }
 
   @Override
-  public synchronized Picture takePicture(final CameraSettings settings) throws IOException
-  {
+  public synchronized Picture takePicture(final CameraSettings settings) throws IOException {
     final bst_ims100_img_t image = new bst_ims100_img_t();
     ims100_api.bst_ims100_img_config_default(imageConfig);
     // TODO this is not scaling but cropping the picture
@@ -233,10 +222,11 @@ public class CameraOPSSATAdapter implements CameraAdapterInterface
     ims100_api.bst_ims100_set_img_config(imageConfig);
     // Each pixel of raw image is encoded as uint16
     LOGGER.log(Level.INFO, String.format("Allocating native buffer"));
-    final int dataN
-        = (int) (settings.getResolution().getHeight().getValue() * settings.getResolution().getWidth().getValue());
-    final ByteBuffer imageData = ByteBuffer.allocateDirect(
-            dataN * 2);
+    final int dataN =
+        (int)
+            (settings.getResolution().getHeight().getValue()
+                * settings.getResolution().getWidth().getValue());
+    final ByteBuffer imageData = ByteBuffer.allocateDirect(dataN * 2);
     image.setData(imageData);
     image.setData_n(dataN);
 
@@ -257,9 +247,10 @@ public class CameraOPSSATAdapter implements CameraAdapterInterface
     replySettings.setGainBlue(settings.getGainBlue());
     if (settings.getFormat() != PictureFormat.RAW) {
       // Run debayering and possibly process further
-      //TODO Use a native debayering acceleration
-      LOGGER.log(Level.INFO, String.format(
-            "Converting the image from RAW to " + settings.getFormat().toString()));
+      // TODO Use a native debayering acceleration
+      LOGGER.log(
+          Level.INFO,
+          String.format("Converting the image from RAW to " + settings.getFormat().toString()));
       rawData = convertImage(rawData, settings.getFormat());
     }
     replySettings.setFormat(settings.getFormat());
@@ -267,20 +258,17 @@ public class CameraOPSSATAdapter implements CameraAdapterInterface
   }
 
   @Override
-  public Duration getMinimumPeriod()
-  {
+  public Duration getMinimumPeriod() {
     return MINIMUM_PERIOD;
   }
 
   @Override
-  public PictureFormatList getAvailableFormats()
-  {
+  public PictureFormatList getAvailableFormats() {
     return supportedFormats;
   }
 
-  private byte[] convertImage(final byte[] rawImage, final PictureFormat targetFormat) throws
-      IOException
-  {
+  private byte[] convertImage(final byte[] rawImage, final PictureFormat targetFormat)
+      throws IOException {
     final BufferedImage image = OPSSATCameraDebayering.getDebayeredImage(rawImage);
     byte[] ret = null;
 
@@ -294,8 +282,8 @@ public class CameraOPSSATAdapter implements CameraAdapterInterface
       for (int i = 0; i < rgba.length; ++i) {
         final int pixelval = rgba[i];
         ret[i * 3 + 0] = (byte) ((pixelval >> 16) & 0xFF); // R
-        ret[i * 3 + 1] = (byte) ((pixelval >> 8) & 0xFF);  // G
-        ret[i * 3 + 2] = (byte) ((pixelval) & 0xFF);       // B
+        ret[i * 3 + 1] = (byte) ((pixelval >> 8) & 0xFF); // G
+        ret[i * 3 + 2] = (byte) ((pixelval) & 0xFF); // B
         // Ignore Alpha channel
       }
     } else if (targetFormat.equals(PictureFormat.BMP)) {
