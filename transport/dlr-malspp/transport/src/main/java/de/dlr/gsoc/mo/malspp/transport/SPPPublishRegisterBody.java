@@ -28,18 +28,22 @@ import org.ccsds.moims.mo.mal.transport.MALPublishRegisterBody;
 
 public class SPPPublishRegisterBody extends SPPMessageBody implements MALPublishRegisterBody {
 
-    public SPPPublishRegisterBody(final Object[] bodyElements, final MALElementStreamFactory esf,
-            final MALEncodingContext ctx) {
-        super(bodyElements, esf, ctx);
-    }
+  public SPPPublishRegisterBody(
+      final Object[] bodyElements,
+      final MALElementStreamFactory esf,
+      final MALEncodingContext ctx) {
+    super(bodyElements, esf, ctx);
+  }
 
-    public SPPPublishRegisterBody(final MALEncodedBody encodedBody, final MALElementStreamFactory esf,
-            final MALEncodingContext ctx) {
-        super(encodedBody, esf, ctx);
-    }
+  public SPPPublishRegisterBody(
+      final MALEncodedBody encodedBody,
+      final MALElementStreamFactory esf,
+      final MALEncodingContext ctx) {
+    super(encodedBody, esf, ctx);
+  }
 
-    @Override
-    public EntityKeyList getEntityKeyList() throws MALException {
-        return (EntityKeyList) getBodyElement(0, new EntityKeyList());
-    }
+  @Override
+  public EntityKeyList getEntityKeyList() throws MALException {
+    return (EntityKeyList) getBodyElement(0, new EntityKeyList());
+  }
 }

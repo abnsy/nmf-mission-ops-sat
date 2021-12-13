@@ -13,24 +13,24 @@
  * You on an "as is" basis and without warranties of any kind, including without
  * limitation merchantability, fitness for a particular purpose, absence of
  * defects or errors, accuracy or non-infringement of intellectual property rights.
- * 
+ *
  * See the License for the specific language governing permissions and
- * limitations under the License. 
+ * limitations under the License.
  * ----------------------------------------------------------------------------
  */
 package esa.mo.platform.impl.util;
 
 import esa.mo.com.impl.util.COMServicesProvider;
 import esa.mo.nanomind.impl.util.NanomindServicesConsumer;
-import esa.mo.platform.impl.provider.gen.PowerControlProviderServiceImpl;
+import esa.mo.platform.impl.provider.gen.AutonomousADCSProviderServiceImpl;
 import esa.mo.platform.impl.provider.gen.CameraProviderServiceImpl;
 import esa.mo.platform.impl.provider.gen.GPSProviderServiceImpl;
-import esa.mo.platform.impl.provider.gen.AutonomousADCSProviderServiceImpl;
 import esa.mo.platform.impl.provider.gen.OpticalDataReceiverProviderServiceImpl;
+import esa.mo.platform.impl.provider.gen.PowerControlProviderServiceImpl;
 import esa.mo.platform.impl.provider.gen.SoftwareDefinedRadioProviderServiceImpl;
+import esa.mo.platform.impl.provider.opssat.AutonomousADCSOPSSATAdapter;
 import esa.mo.platform.impl.provider.opssat.CameraOPSSATAdapter;
 import esa.mo.platform.impl.provider.opssat.GPSOPSSATAdapter;
-import esa.mo.platform.impl.provider.opssat.AutonomousADCSOPSSATAdapter;
 import esa.mo.platform.impl.provider.opssat.OpticalRxOPSSATAdapter;
 import esa.mo.platform.impl.provider.opssat.PowerControlOPSSATAdapter;
 import esa.mo.platform.impl.provider.opssat.SDROPSSATAdapter;
@@ -38,32 +38,27 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.ccsds.moims.mo.mal.MALException;
 
-/**
- *
- *
- */
-public class PlatformServicesProviderOPSSAT implements PlatformServicesProviderInterface
-{
+/** */
+public class PlatformServicesProviderOPSSAT implements PlatformServicesProviderInterface {
 
-  private final static Logger LOGGER = Logger.getLogger(
-      PlatformServicesProviderOPSSAT.class.getName());
-  private final AutonomousADCSProviderServiceImpl adcsService
-      = new AutonomousADCSProviderServiceImpl();
+  private static final Logger LOGGER =
+      Logger.getLogger(PlatformServicesProviderOPSSAT.class.getName());
+  private final AutonomousADCSProviderServiceImpl adcsService =
+      new AutonomousADCSProviderServiceImpl();
   private final CameraProviderServiceImpl cameraService = new CameraProviderServiceImpl();
   private final GPSProviderServiceImpl gpsService = new GPSProviderServiceImpl();
-  private final OpticalDataReceiverProviderServiceImpl optrxService
-      = new OpticalDataReceiverProviderServiceImpl();
-  private final PowerControlProviderServiceImpl powerService = new PowerControlProviderServiceImpl();
-  private final SoftwareDefinedRadioProviderServiceImpl sdrService
-      = new SoftwareDefinedRadioProviderServiceImpl();
+  private final OpticalDataReceiverProviderServiceImpl optrxService =
+      new OpticalDataReceiverProviderServiceImpl();
+  private final PowerControlProviderServiceImpl powerService =
+      new PowerControlProviderServiceImpl();
+  private final SoftwareDefinedRadioProviderServiceImpl sdrService =
+      new SoftwareDefinedRadioProviderServiceImpl();
 
   @Override
-  public void init(final COMServicesProvider comServices) throws
-      MALException
-  {
+  public void init(final COMServicesProvider comServices) throws MALException {
     try {
       final NanomindServicesConsumer obcServicesConsumer = new NanomindServicesConsumer();
-        obcServicesConsumer.init();
+      obcServicesConsumer.init();
       powerService.init(new PowerControlOPSSATAdapter(obcServicesConsumer));
       gpsService.init(comServices, new GPSOPSSATAdapter(obcServicesConsumer));
       adcsService.init(comServices, new AutonomousADCSOPSSATAdapter());
@@ -71,39 +66,35 @@ public class PlatformServicesProviderOPSSAT implements PlatformServicesProviderI
       optrxService.init(new OpticalRxOPSSATAdapter());
       sdrService.init(new SDROPSSATAdapter());
     } catch (final UnsatisfiedLinkError | NoClassDefFoundError | NoSuchMethodError error) {
-      LOGGER.log(Level.SEVERE,
-          "Could not load platform adapters (check for missing JARs and libraries)", error);
+      LOGGER.log(
+          Level.SEVERE,
+          "Could not load platform adapters (check for missing JARs and libraries)",
+          error);
     }
   }
 
   @Override
-  public GPSProviderServiceImpl getGPSService()
-  {
+  public GPSProviderServiceImpl getGPSService() {
     return this.gpsService;
   }
 
   @Override
-  public CameraProviderServiceImpl getCameraService()
-  {
+  public CameraProviderServiceImpl getCameraService() {
     return this.cameraService;
   }
 
   @Override
-  public AutonomousADCSProviderServiceImpl getAutonomousADCSService()
-  {
+  public AutonomousADCSProviderServiceImpl getAutonomousADCSService() {
     return this.adcsService;
   }
 
   @Override
-  public OpticalDataReceiverProviderServiceImpl getOpticalDataReceiverService()
-  {
+  public OpticalDataReceiverProviderServiceImpl getOpticalDataReceiverService() {
     return this.optrxService;
   }
 
   @Override
-  public SoftwareDefinedRadioProviderServiceImpl getSoftwareDefinedRadioService()
-  {
+  public SoftwareDefinedRadioProviderServiceImpl getSoftwareDefinedRadioService() {
     return this.sdrService;
   }
-
 }

@@ -13,9 +13,9 @@
  * You on an "as is" basis and without warranties of any kind, including without
  * limitation merchantability, fitness for a particular purpose, absence of
  * defects or errors, accuracy or non-infringement of intellectual property rights.
- * 
+ *
  * See the License for the specific language governing permissions and
- * limitations under the License. 
+ * limitations under the License.
  * ----------------------------------------------------------------------------
  */
 package esa.opssat.nanomind.com;
@@ -23,11 +23,8 @@ package esa.opssat.nanomind.com;
 import esa.opssat.nanomind.com.structures.ObjectType;
 import org.ccsds.moims.mo.mal.structures.Identifier;
 
-/**
- *
- */
-public class COMObject
-{
+/** */
+public class COMObject {
   private final ObjectType objectType;
   private final Identifier objectName;
   private final Object bodyShortForm;
@@ -37,18 +34,18 @@ public class COMObject
   private final ObjectType sourceType;
   private final boolean event;
 
-  public COMObject(final org.ccsds.moims.mo.mal.structures.UShort area,
-                   final org.ccsds.moims.mo.mal.structures.UShort service,
-                   final org.ccsds.moims.mo.mal.structures.UOctet version,
-                   final org.ccsds.moims.mo.mal.structures.UShort number,
-                   final Identifier name,
-                   final Object bodyShortForm,
-                   final boolean hasRelated,
-                   final ObjectType relatedType,
-                   final boolean hasSource,
-                   final ObjectType sourceType,
-                   final boolean isEvent)
-  {
+  public COMObject(
+      final org.ccsds.moims.mo.mal.structures.UShort area,
+      final org.ccsds.moims.mo.mal.structures.UShort service,
+      final org.ccsds.moims.mo.mal.structures.UOctet version,
+      final org.ccsds.moims.mo.mal.structures.UShort number,
+      final Identifier name,
+      final Object bodyShortForm,
+      final boolean hasRelated,
+      final ObjectType relatedType,
+      final boolean hasSource,
+      final ObjectType sourceType,
+      final boolean isEvent) {
     this.objectType = new ObjectType(area, service, version, number);
     this.objectName = name;
     this.bodyShortForm = bodyShortForm;
@@ -59,15 +56,15 @@ public class COMObject
     this.event = isEvent;
   }
 
-  public COMObject(final ObjectType objectType,
-                   final Identifier name,
-                   final Object bodyShortForm,
-                   final boolean hasRelated,
-                   final ObjectType relatedType,
-                   final boolean hasSource,
-                   final ObjectType sourceType,
-                   final boolean isEvent)
-  {
+  public COMObject(
+      final ObjectType objectType,
+      final Identifier name,
+      final Object bodyShortForm,
+      final boolean hasRelated,
+      final ObjectType relatedType,
+      final boolean hasSource,
+      final ObjectType sourceType,
+      final boolean isEvent) {
     this.objectType = objectType;
     this.objectName = name;
     this.bodyShortForm = bodyShortForm;
@@ -77,44 +74,36 @@ public class COMObject
     this.sourceType = sourceType;
     this.event = isEvent;
   }
-  
-  public ObjectType getObjectType()
-  {
+
+  public ObjectType getObjectType() {
     return objectType;
   }
 
-  public Identifier getObjectName()
-  {
+  public Identifier getObjectName() {
     return objectName;
   }
 
-  public Object getBodyShortForm()
-  {
+  public Object getBodyShortForm() {
     return bodyShortForm;
   }
 
-  public boolean hasRelated()
-  {
+  public boolean hasRelated() {
     return hasRelated;
   }
 
-  public ObjectType getRelatedType()
-  {
+  public ObjectType getRelatedType() {
     return relatedType;
   }
 
-  public boolean hasSource()
-  {
+  public boolean hasSource() {
     return hasSource;
   }
 
-  public ObjectType getSourceType()
-  {
+  public ObjectType getSourceType() {
     return sourceType;
   }
 
-  public boolean isEvent()
-  {
+  public boolean isEvent() {
     return event;
   }
 }

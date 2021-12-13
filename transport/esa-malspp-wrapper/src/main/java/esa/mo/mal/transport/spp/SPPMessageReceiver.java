@@ -13,9 +13,9 @@
  * You on an "as is" basis and without warranties of any kind, including without
  * limitation merchantability, fitness for a particular purpose, absence of
  * defects or errors, accuracy or non-infringement of intellectual property rights.
- * 
+ *
  * See the License for the specific language governing permissions and
- * limitations under the License. 
+ * limitations under the License.
  * ----------------------------------------------------------------------------
  */
 package esa.mo.mal.transport.spp;
@@ -24,10 +24,9 @@ import java.io.IOException;
 import org.ccsds.moims.mo.testbed.util.spp.SPPSocket;
 import org.ccsds.moims.mo.testbed.util.spp.SpacePacket;
 
-/**
- */
-public class SPPMessageReceiver implements esa.mo.mal.transport.gen.util.GENMessagePoller.GENMessageReceiver<SpacePacket>
-{
+/** */
+public class SPPMessageReceiver
+    implements esa.mo.mal.transport.gen.util.GENMessagePoller.GENMessageReceiver<SpacePacket> {
   protected final SPPSocket socket;
 
   /**
@@ -35,16 +34,13 @@ public class SPPMessageReceiver implements esa.mo.mal.transport.gen.util.GENMess
    *
    * @param socket the socket.
    */
-  public SPPMessageReceiver(final SPPSocket socket)
-  {
+  public SPPMessageReceiver(final SPPSocket socket) {
     this.socket = socket;
   }
 
   @Override
-  public SpacePacket readEncodedMessage() throws IOException
-  {
-    try
-    {
+  public SpacePacket readEncodedMessage() throws IOException {
+    try {
       final SpacePacket spacePacket = socket.receive();
 
       // PENDING: SPP TCP implementation allocates a new Space Packet with a body size of
@@ -56,23 +52,17 @@ public class SPPMessageReceiver implements esa.mo.mal.transport.gen.util.GENMess
       spacePacket.setBody(trimmedBody);
 
       return spacePacket;
-    }
-    catch (final Exception ex)
-    {
+    } catch (final Exception ex) {
       // socket has been closed to throw EOF exception higher
       throw new java.io.EOFException();
     }
   }
 
   @Override
-  public void close()
-  {
-    try
-    {
+  public void close() {
+    try {
       socket.close();
-    }
-    catch (final Exception ex)
-    {
+    } catch (final Exception ex) {
       ex.printStackTrace();
     }
   }

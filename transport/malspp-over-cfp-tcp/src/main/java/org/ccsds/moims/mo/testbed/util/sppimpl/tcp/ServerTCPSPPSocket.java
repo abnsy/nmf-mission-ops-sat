@@ -1,60 +1,54 @@
-/** *****************************************************************************
- * Copyright or © or Copr. CNES
+/**
+ * ***************************************************************************** Copyright or © or
+ * Copr. CNES
  *
- * This software is a computer program whose purpose is to provide a
- * framework for the CCSDS Mission Operations services.
+ * <p>This software is a computer program whose purpose is to provide a framework for the CCSDS
+ * Mission Operations services.
  *
- * This software is governed by the CeCILL-C license under French law and
- * abiding by the rules of distribution of free software.  You can  use,
- * modify and/ or redistribute the software under the terms of the CeCILL-C
- * license as circulated by CEA, CNRS and INRIA at the following URL
+ * <p>This software is governed by the CeCILL-C license under French law and abiding by the rules of
+ * distribution of free software. You can use, modify and/ or redistribute the software under the
+ * terms of the CeCILL-C license as circulated by CEA, CNRS and INRIA at the following URL
  * "http://www.cecill.info".
  *
- * As a counterpart to the access to the source code and  rights to copy,
- * modify and redistribute granted by the license, users are provided only
- * with a limited warranty  and the software's author,  the holder of the
- * economic rights,  and the successive licensors  have only  limited
+ * <p>As a counterpart to the access to the source code and rights to copy, modify and redistribute
+ * granted by the license, users are provided only with a limited warranty and the software's
+ * author, the holder of the economic rights, and the successive licensors have only limited
  * liability.
  *
- * In this respect, the user's attention is drawn to the risks associated
- * with loading,  using,  modifying and/or developing or reproducing the
- * software by the user in light of its specific status of free software,
- * that may mean  that it is complicated to manipulate,  and  that  also
- * therefore means  that it is reserved for developers  and  experienced
- * professionals having in-depth computer knowledge. Users are therefore
- * encouraged to load and test the software's suitability as regards their
- * requirements in conditions enabling the security of their systems and/or
- * data to be ensured and,  more generally, to use and operate it in the
- * same conditions as regards security.
+ * <p>In this respect, the user's attention is drawn to the risks associated with loading, using,
+ * modifying and/or developing or reproducing the software by the user in light of its specific
+ * status of free software, that may mean that it is complicated to manipulate, and that also
+ * therefore means that it is reserved for developers and experienced professionals having in-depth
+ * computer knowledge. Users are therefore encouraged to load and test the software's suitability as
+ * regards their requirements in conditions enabling the security of their systems and/or data to be
+ * ensured and, more generally, to use and operate it in the same conditions as regards security.
  *
- * The fact that you are presently reading this means that you have had
- * knowledge of the CeCILL-C license and that you accept its terms.
- ****************************************************************************** */
+ * <p>The fact that you are presently reading this means that you have had knowledge of the CeCILL-C
+ * license and that you accept its terms.
+ * *****************************************************************************
+ */
 package org.ccsds.moims.mo.testbed.util.sppimpl.tcp;
 
+import fr.dyade.aaa.common.Daemon;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.LinkedBlockingQueue;
-
+import java.util.logging.Level;
 import org.ccsds.moims.mo.testbed.util.spp.SPPSocket;
 import org.ccsds.moims.mo.testbed.util.spp.SpacePacket;
 
-import fr.dyade.aaa.common.Daemon;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.logging.Level;
+public class ServerTCPSPPSocket implements SPPSocket {
 
-public class ServerTCPSPPSocket implements SPPSocket
-{
-
-  private static final java.util.logging.Logger LOGGER
-      = java.util.logging.Logger.getLogger(ServerTCPSPPSocket.class.getName());
+  private static final java.util.logging.Logger LOGGER =
+      java.util.logging.Logger.getLogger(ServerTCPSPPSocket.class.getName());
 
   private static final int MAX_ERROR_COUNT = 10;
 
-  public final static String PORT_PROP = "org.ccsds.moims.mo.malspp.test.sppimpl.tcp.port";
+  public static final String PORT_PROP = "org.ccsds.moims.mo.malspp.test.sppimpl.tcp.port";
   private int port;
   private ServerSocket listenerSocket;
   private boolean tcpNoDelay;
@@ -63,37 +57,32 @@ public class ServerTCPSPPSocket implements SPPSocket
 
   private final LinkedBlockingQueue<SpacePacket> input = new LinkedBlockingQueue<>();
 
-  public ServerTCPSPPSocket()
-  {
+  public ServerTCPSPPSocket() {
     super();
   }
 
-  public void init(final Map properties) throws Exception
-  {
+  public void init(final Map properties) throws Exception {
     final String portS = (String) properties.get(PORT_PROP);
     port = Integer.parseInt(portS);
     listen(port);
   }
 
-  private void listen(final int port) throws Exception
-  {
-    LOGGER.log(Level.FINE, "listen({0})", new Object[]{port});
+  private void listen(final int port) throws Exception {
+    LOGGER.log(Level.FINE, "listen({0})", new Object[] {port});
     listenerSocket = new ServerSocket(port);
     readerDaemon = new AcceptorDaemon();
     readerDaemon.start();
   }
 
   @Override
-  public void close() throws Exception
-  {
+  public void close() throws Exception {
     closeClientChannels();
     if (readerDaemon != null) {
       readerDaemon.stop();
     }
   }
 
-  private void closeClientChannels()
-  {
+  private void closeClientChannels() {
     synchronized (channels) {
       for (final SPPChannel channel : channels) {
         if (channel != null) {
@@ -104,16 +93,14 @@ public class ServerTCPSPPSocket implements SPPSocket
   }
 
   @Override
-  public SpacePacket receive() throws Exception
-  {
+  public SpacePacket receive() throws Exception {
     final SpacePacket packet = input.take();
     LOGGER.log(Level.FINE, "Received: {0}", packet);
     return packet;
   }
 
   @Override
-  public void send(final SpacePacket packet) throws IOException
-  {
+  public void send(final SpacePacket packet) throws IOException {
     LOGGER.log(Level.FINE, "send({0})", packet);
     synchronized (channels) {
       if (channels.isEmpty()) {
@@ -125,31 +112,25 @@ public class ServerTCPSPPSocket implements SPPSocket
         }
       }
     }
-
   }
 
   @Override
-  public String getDescription()
-  {
+  public String getDescription() {
     return "-" + port;
-
   }
 
-  class AcceptorDaemon extends Daemon
-  {
+  class AcceptorDaemon extends Daemon {
 
     private Socket clientSocket;
 
     private SpacePacket packet;
 
-    protected AcceptorDaemon()
-    {
+    protected AcceptorDaemon() {
       super("AcceptorDaemon", null);
     }
 
     @Override
-    public final void run()
-    {
+    public final void run() {
       int errorCount = 0;
       while (running) {
         if (errorCount >= MAX_ERROR_COUNT) {
@@ -157,7 +138,9 @@ public class ServerTCPSPPSocket implements SPPSocket
           break;
         }
         try {
-          LOGGER.log(Level.INFO, "Listening for a client connection on {0}",
+          LOGGER.log(
+              Level.INFO,
+              "Listening for a client connection on {0}",
               listenerSocket.getLocalSocketAddress());
           clientSocket = listenerSocket.accept();
         } catch (final IOException ex) {
@@ -180,8 +163,8 @@ public class ServerTCPSPPSocket implements SPPSocket
           continue;
         }
         errorCount = 0;
-        LOGGER.log(Level.INFO, "Accepted connection from: {0}",
-            clientSocket.getRemoteSocketAddress());
+        LOGGER.log(
+            Level.INFO, "Accepted connection from: {0}", clientSocket.getRemoteSocketAddress());
         synchronized (channels) {
           channels.add(newChannel);
         }
@@ -191,18 +174,15 @@ public class ServerTCPSPPSocket implements SPPSocket
       finish();
     }
 
-    private class ClientThread extends Thread
-    {
+    private class ClientThread extends Thread {
 
       protected SPPChannel channel;
 
-      public ClientThread(final SPPChannel channel)
-      {
+      public ClientThread(final SPPChannel channel) {
         this.channel = channel;
       }
 
-      public void run()
-      {
+      public void run() {
         try {
           while (running) {
             canStop = true;
@@ -213,8 +193,10 @@ public class ServerTCPSPPSocket implements SPPSocket
             input.offer(packet);
           }
         } catch (final IOException ex) {
-          LOGGER.log(Level.WARNING,
-              this.getName() + ", error during packet receive. Closing the client connection.", ex);
+          LOGGER.log(
+              Level.WARNING,
+              this.getName() + ", error during packet receive. Closing the client connection.",
+              ex);
 
         } finally {
           if (channel != null) {
@@ -229,8 +211,7 @@ public class ServerTCPSPPSocket implements SPPSocket
     }
 
     @Override
-    protected void close()
-    {
+    protected void close() {
       if (listenerSocket != null) {
         try {
           listenerSocket.close();
@@ -240,10 +221,8 @@ public class ServerTCPSPPSocket implements SPPSocket
     }
 
     @Override
-    protected void shutdown()
-    {
+    protected void shutdown() {
       close();
     }
   }
-
 }
